@@ -1,0 +1,171 @@
+package jpdftweak.gui.tabs;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+import com.lowagie.text.DocumentException;
+
+import jpdftweak.core.PdfInputFile;
+import jpdftweak.core.PdfPageRange;
+import jpdftweak.core.PdfTweak;
+import jpdftweak.gui.MainForm;
+import jpdftweak.gui.PasswordInputBox;
+import jpdftweak.gui.TableComponent;
+
+public class InputTab extends Tab {
+
+	private JTextField filename;
+	private JCheckBox multiFiles;
+	private TableComponent fileCombination;
+	private JButton selectfile;
+	private List<PdfInputFile> inputFiles = new ArrayList<PdfInputFile>();
+	private JComboBox filesCombo;
+	private final MainForm mf;
+
+	public InputTab(MainForm mf) {
+		super(new FormLayout("f:p, f:p:g, f:p, f:p", "f:p, f:p, f:p:g"));
+		this.mf = mf;
+		CellConstraints cc = new CellConstraints();
+		this.add(new JLabel("Filename"), cc.xy(1,1));
+		this.add(filename = new JTextField(), cc.xy(2, 1));
+		filename.setEditable(false);
+		this.add(selectfile = new JButton("Select..."), cc.xy(3, 1));
+		selectfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectFile();
+			}
+		});
+		JButton clear;
+		this.add(clear = new JButton("Clear"), cc.xy(4,1));
+		clear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				filesCombo.removeAllItems();
+				inputFiles.clear();
+				InputTab.this.mf.setInputFile(null);
+				fileCombination.clear();
+				selectfile.setEnabled(true);
+				multiFiles.setEnabled(true);
+				updateFileName();
+			}
+		});
+		this.add(multiFiles= new JCheckBox("Multiple file input / Select pages"), cc.xyw(1, 2, 4));
+		multiFiles.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (multiFiles.isSelected()) {
+					selectfile.setEnabled(true);
+					fileCombination.setEnabled(true);
+				} else {
+					selectfile.setEnabled(inputFiles.size() == 0);
+					fileCombination.setEnabled(false);
+				}
+			}
+		});
+		filesCombo = new JComboBox();
+		this.add(fileCombination = new TableComponent(new String[] {"File", "From Page", "To Page", "Include Odd", "Include Even"}, new Class[] {PdfInputFile.class, Integer.class, Integer.class, Boolean.class, Boolean.class}, new Object[] {null, 1, -1, true, true}), cc.xyw(1, 3, 4));
+		fileCombination.setEnabled(false);
+		fileCombination.getTable().getColumnModel().getColumn(0).setPreferredWidth(300);
+		fileCombination.getTable().getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(filesCombo));
+		updateFileName();
+	}
+
+
+	private void updateFileName() {
+		String fn;
+		if (inputFiles.size() == 0) {
+			fn="(No file selected)";
+		} else if (inputFiles.size() ==1) {
+			fn = inputFiles.get(0).getFile().getName();
+		} else {
+			fn = "("+inputFiles.size()+" files selected)";
+		}
+		filename.setText(fn);
+	}
+
+
+	protected void selectFile() {
+		JFileChooser pdfChooser = mf.getPdfChooser();
+		if (pdfChooser.showOpenDialog(mf) != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		File file = pdfChooser.getSelectedFile();
+		PdfInputFile f;
+		try {
+			f = new PdfInputFile(file, "");
+		} catch (IOException ex) {
+			try {
+				char[] pwd = PasswordInputBox.askForPassword(mf);
+				if (pwd == null) return;
+				String password = new String(pwd);
+				f = new PdfInputFile(file, password);
+			} catch (IOException ex2) {
+				ex2.printStackTrace();
+				JOptionPane.showMessageDialog(mf, ex2.getMessage(), "Error reading input file", JOptionPane.ERROR_MESSAGE );
+				return;
+			}
+		}
+		inputFiles.add(f);
+		if (inputFiles.size() == 1) mf.setInputFile(f);
+		filesCombo.addItem(f);
+		fileCombination.addRow(f, 1, f.getPageCount(), true, true);
+		if (!multiFiles.isSelected() && inputFiles.size() > 0)
+			selectfile.setEnabled(false);
+		if (inputFiles.size()>1) {
+			multiFiles.setSelected(true);
+			multiFiles.setEnabled(false);
+		}
+		updateFileName();
+	}
+
+
+	@Override
+	public String getTabName() {
+		return "Input";
+	}
+
+	@Override
+	public void checkRun() throws IOException {
+		if (inputFiles.size() == 0) 
+			throw new IOException("No input file selected");
+	}
+
+	@Override
+	public PdfTweak run(PdfTweak tweak) throws DocumentException, IOException {
+		if (multiFiles.isSelected()) {
+			for (PdfInputFile f : inputFiles) {
+				f.reopen();
+			}
+			List<PdfPageRange> ranges = new ArrayList<PdfPageRange>();
+			for(int i=0; i <fileCombination.getRowCount(); i++) {
+				Object[] row = fileCombination.getRow(i);
+				if (row[0] == null) continue;
+				PdfInputFile ifile = (PdfInputFile)row[0];
+				int from = (Integer)row[1];
+				int to = (Integer)row[2];
+				boolean odd = (Boolean)row[3];
+				boolean even = (Boolean)row[4];
+				ranges.add(new PdfPageRange(ifile, from, to, odd, even));
+			}
+			 return new PdfTweak(inputFiles.get(0), ranges);
+		} else {
+			inputFiles.get(0).reopen();
+			return new PdfTweak(inputFiles.get(0));
+		}
+	}
+
+}

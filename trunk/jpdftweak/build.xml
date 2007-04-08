@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<project name="jPDFtweak" default="jar">
+
+	<property name="LIB" value="lib" />
+	<property name="ITEXT" value="${LIB}/itext.jar" />
+	<property name="BCPROV" value="${LIB}/bcprov.jar" />
+	<property name="BCMAIL" value="${LIB}/bcmail.jar" />
+	<property name="FORMS" value="${LIB}/forms.jar" />
+	<property name="PROGUARD" value="${LIB}/proguard.jar" />
+
+	<target name="clean">
+		<delete dir="build" />
+		<delete dir="dist" />
+	</target>
+
+	<target name="compile">
+		<mkdir dir="build/bin" />
+		<javac srcdir="src" destdir="build/bin">
+			<classpath>
+				<pathelement path="${ITEXT}" />
+				<pathelement path="${FORMS}" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="jpdftweak.jar" basedir="build/bin">
+			<manifest>
+				<attribute name="Main-Class" value="jpdftweak.Main"/>
+				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/forms.jar"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="staticjar" depends="compile">
+		<jar destfile="build/jpdftweak.jar" basedir="build/bin">
+			<manifest>
+				<attribute name="Main-Class" value="jpdftweak.Main"/>
+			</manifest>
+		</jar>
+		<mkdir dir="build/libs"/>
+		<unjar dest="build/libs">
+			<fileset dir=".">
+				<include name="${ITEXT}"/>
+				<include name="${BCPROV}"/>
+				<include name="${BCMAIL}"/>
+				<include name="${FORMS}"/>
+			</fileset>
+			<patternset>
+				<include name="**/*/*.class"/>
+				<exclude name="META-INF"/>
+				<exclude name="META-INF/*"/>
+				<include name="com/lowagie/text/pdf/codec/postscript/*.ps"/>
+				<include name="com/lowagie/text/pdf/fonts/*"/>
+				<exclude name="com/lowagie/tools/**"/>
+				<exclude name="org/bouncycastle/mail/**"/>
+			</patternset>
+		</unjar>		
+		<zip destfile="build/libs.jar" basedir="build/libs"/>
+		<java fork="true" jar="${PROGUARD}">
+			<!-- Proguard can be very resource hungry -->
+			<jvmarg value="-Xmx128M"/>
+			<jvmarg value="-Xss2M"/>
+			<arg value="@jpdftweak.pro"/>
+		</java>
+	</target>
+</project>

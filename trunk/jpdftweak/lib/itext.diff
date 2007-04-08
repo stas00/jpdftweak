@@ -1,0 +1,91 @@
+diff -Naurp itext-orig/com/lowagie/text/pdf/PdfEncryption.java itext/com/lowagie/text/pdf/PdfEncryption.java
+--- itext-orig/com/lowagie/text/pdf/PdfEncryption.java	2007-02-06 13:10:38.000000000 +0100
++++ itext/com/lowagie/text/pdf/PdfEncryption.java	2007-04-07 21:49:20.078125000 +0200
+@@ -520,4 +520,19 @@ public class PdfEncryption {
+         documentID = createDocumentId();
+         publicKeyHandler.addRecipient(new PdfPublicKeyRecipient(cert, permission));
+     }    
++
++    public byte[] computeUserPassword(byte[] ownerPassword) {
++        byte[] userPad = computeOwnerKey(ownerKey, padPassword(ownerPassword));
++        outerLoop:
++            for (int i = 0; i < userPad.length; i++) {
++                for (int j = 0; j < userPad.length-i; j++) {
++                    if (userPad[i+j] != pad[j])
++                        continue outerLoop;
++                }
++                byte[] userPassword=new byte[i];
++                System.arraycopy(userPad, 0, userPassword, 0, i);
++                return userPassword;
++            }
++        return userPad;
++    }
+ }
+\ No newline at end of file
+diff -Naurp itext-orig/com/lowagie/text/pdf/PdfReader.java itext/com/lowagie/text/pdf/PdfReader.java
+--- itext-orig/com/lowagie/text/pdf/PdfReader.java	2007-03-07 09:40:14.000000000 +0100
++++ itext/com/lowagie/text/pdf/PdfReader.java	2007-04-07 21:49:26.968750000 +0200
+@@ -121,6 +121,7 @@ public class PdfReader implements PdfVie
+     protected Key certificateKey = null; //added by Aiken Sam for certificate decryption
+     protected Certificate certificate = null; //added by Aiken Sam for certificate decryption
+     protected String certificateKeyProvider = null; //added by Aiken Sam for certificate decryption    
++    protected boolean ownerPasswordUsed = false;
+     protected ArrayList strings = new ArrayList();
+     protected boolean sharedStreams = true;
+     protected boolean consolidateNamedDestinations = false;
+@@ -747,15 +748,17 @@ public class PdfReader implements PdfVie
+ 
+         if (filter.equals(PdfName.STANDARD))
+         {
+-            //check by user password
+-            decrypt.setupByUserPassword(documentID, password, oValue, pValue);
+-            if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
+-                //check by owner password
+-                decrypt.setupByOwnerPassword(documentID, password, uValue, oValue, pValue);
+-                if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
+-                    throw new IOException("Bad user password");
+-                }
+-            }
++            //check by owner password
++        	decrypt.setupByOwnerPassword(documentID, password, uValue, oValue, pValue);
++        	if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
++        		//check by user password
++        		decrypt.setupByUserPassword(documentID, password, oValue, pValue);
++        		if (!equalsArray(uValue, decrypt.userKey, (rValue == 3 || rValue == 4) ? 16 : 32)) {
++        			throw new IOException("Bad user password");
++        		}
++        	} else {
++        		ownerPasswordUsed = true;
++        	}
+         } else if (filter.equals(PdfName.PUBSEC)) {   
+             decrypt.setupByEncryptionKey(encryptionKey, lengthValue);  
+         }
+@@ -3339,5 +3342,28 @@ public class PdfReader implements PdfVie
+         if (p == null)
+             return PdfSignatureAppearance.NOT_CERTIFIED;
+         return p.intValue();
++    }
++
++    public boolean isOpenedWithFullPermissions() {
++        return !encrypted || ownerPasswordUsed;
+     } 
++    
++    public int getCryptoMode() {
++        if (decrypt == null) 
++            return -1;
++        else 
++            return decrypt.getCryptoMode();
++    }
++
++    public boolean isMetadataEncrypted() {
++        if (decrypt == null) 
++            return false; 
++        else 
++            return decrypt.isMetadataEncrypted();
++    }
++
++    public byte[] computeUserPassword() {
++        if (!encrypted || !ownerPasswordUsed) return null;
++        return decrypt.computeUserPassword(password);
++    }
+ }
