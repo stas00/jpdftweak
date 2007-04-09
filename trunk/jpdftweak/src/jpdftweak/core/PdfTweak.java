@@ -1,8 +1,15 @@
 package jpdftweak.core;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,18 +19,22 @@ import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PRAcroForm;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfCopy;
 import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfGState;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfNumber;
 import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfTemplate;
+import com.lowagie.text.pdf.PdfTransition;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.interfaces.PdfEncryptionSettings;
 
@@ -62,6 +73,15 @@ public class PdfTweak {
 	private int encryptionMode = -1, encryptionPermissions = -1;
 	private byte[] userPassword = null;
 	private byte[] ownerPassword = null;
+	private int[][] transitionValues;
+	private Map<PdfName, PdfObject> optionalViewerPreferences;
+	private int simpleViewerPreferences;
+	private List<File> attachments = null;
+	private PrivateKey key = null;
+	private Certificate[] certChain = null;
+	private int certificationLevel = 0;
+	private boolean sigVisible=false;
+	
 
 	public PdfTweak(PdfInputFile singleFile) {
 		currentReader = singleFile.getReader();
@@ -159,10 +179,38 @@ public class PdfTweak {
 					document.close();
 				}
 			} else {
-				PdfStamper stamper = new PdfStamper(currentReader, new FileOutputStream(outputFile));
+				PdfStamper stamper;
+				if (key != null) {
+					stamper = PdfStamper.createSignature(currentReader, new FileOutputStream(outputFile), '\0', null, true);
+					PdfSignatureAppearance sap = stamper.getSignatureAppearance();
+					sap.setCrypto(key, certChain, null, PdfSignatureAppearance.WINCER_SIGNED);
+					sap.setCertificationLevel(certificationLevel);
+					if (sigVisible)
+						sap.setVisibleSignature(new Rectangle(100, 100, 200, 200), 1, null);
+				} else {
+					stamper = new PdfStamper(currentReader, new FileOutputStream(outputFile));
+				}
 				setEncryptionSettings(stamper);
 				for (int i = 1; i <= total; i++) {
 					currentReader.setPageContent(i, currentReader.getPageContent(i));
+				}
+				if (transitionValues != null) {
+					for (int i = 0; i < total; i++) {
+						PdfTransition t = transitionValues[i][0] == 0 ? null : new PdfTransition(transitionValues[i][0], transitionValues[i][1]);
+						stamper.setTransition(t, i+1);
+						stamper.setDuration(transitionValues[i][2], i+1);
+					}
+				}
+				if (optionalViewerPreferences != null) {
+					stamper.setViewerPreferences(simpleViewerPreferences);
+					for(Map.Entry<PdfName, PdfObject> e : optionalViewerPreferences.entrySet()) {
+						stamper.addViewerPreference(e.getKey(), e.getValue());
+					}
+				}
+				if (attachments != null) {
+					for (File f : attachments) {
+						stamper.addFileAttachment(f.getName(), null, f.getAbsolutePath(), f.getName());
+					}
 				}
 				stamper.close();
 			}
@@ -281,7 +329,8 @@ public class PdfTweak {
 		int cnt = currentReader.getNumberOfPages();
 		int refcnt = ((cnt + (pl-1))/pl)*pl;
 		for (int i = 0; i < cnt; i+=pl) {
-			int idx = i, reverseIdx=Integer.MIN_VALUE;
+			int idx = i;
+			int reverseIdx=refcnt - idx - pl;;
 			if (passLength <0) {
 				idx = i/2;
 				reverseIdx = refcnt - idx-pl;
@@ -343,6 +392,110 @@ public class PdfTweak {
 			if (p != null && p.isDictionary()) {
 				p.remove(new PdfName(PDFTK_PAGE_MARKER));
 			}
+		}
+	}
+
+	public void updateBookmarks(PdfBookmark[] bm) throws DocumentException, IOException{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfStamper stamper = new PdfStamper(currentReader, baos);
+        stamper.setOutlines(PdfBookmark.makeBookmarks(bm));
+        stamper.close();
+		currentReader = new PdfReader(baos.toByteArray());	
+	}
+
+	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, int pnPosition, int pnSize, float pnHOff, float pnVOff) throws DocumentException, IOException {
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+		int pagecount = currentReader.getNumberOfPages();
+	      PdfGState gs1 = new PdfGState();
+	      gs1.setFillOpacity(wmOpacity);
+	      PdfStamper stamper = new PdfStamper(currentReader, baos);
+	      BaseFont bf = BaseFont.createFont("Helvetica", BaseFont.WINANSI,
+                  false);
+	      float txtwidth=0;
+	      PdfImportedPage wmTemplate = null;
+	      if (wmText != null) {
+		      txtwidth = bf.getWidthPoint(wmText, wmSize);
+	      }
+	      if (wmFile != null) {
+	    	  wmTemplate = stamper.getImportedPage(wmFile.getReader(), 1);
+	      }
+	      for (int i = 1; i <= pagecount; i++) {
+	    	  if (wmTemplate != null) {
+	    		  PdfContentByte underContent = stamper.getUnderContent(i);
+	    		  underContent.addTemplate(wmTemplate, 0, 0);
+	    	  }
+	    	  PdfContentByte overContent = stamper.getOverContent(i);
+    		  Rectangle size = currentReader.getPageSizeWithRotation(i);
+	    	  if (wmText != null) {
+	    		  float angle = (float) Math.atan(size.height() / size.width());
+	    		  float m1 = (float) Math.cos(angle);
+	    		  float m2 = (float) - Math.sin(angle);
+	    		  float m3 = (float) Math.sin(angle);
+	    		  float m4 = (float) Math.cos(angle);
+	    		  float xoff = (float) ( -Math.cos(angle) * txtwidth / 2 - Math
+	    				  .sin(angle)
+	    				  * wmSize / 2);
+	    		  float yoff = (float) (Math.sin(angle) * txtwidth / 2 - Math
+	    				  .cos(angle)
+	    				  * wmSize / 2);
+	    		  overContent.saveState();
+	    		  overContent.setGState(gs1);
+	    		  overContent.beginText();
+	    		  overContent.setFontAndSize(bf, wmSize);
+	    		  overContent.setTextMatrix(m1, m2, m3, m4, xoff + size.width() / 2,
+	    				  yoff + size.height() / 2);
+	    		  overContent.showText(wmText);
+	    		  overContent.endText();
+	    		  overContent.restoreState();
+	    	  }
+	    	  if (pnPosition != -1) {
+	    		  overContent.beginText();
+	    		  overContent.setFontAndSize(bf, pnSize);
+	    		  float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.width() * (pnPosition % 3) / 2.0f;
+	    		  float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.height() * (pnPosition / 3) / 2.0f;
+	    		  overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, ""+i, xx, yy, 0);
+	    		  overContent.endText();
+	    	  }
+	      }
+	      stamper.close();
+	      currentReader = new PdfReader(baos.toByteArray());
+	}
+
+	public int getPageCount() {
+		return currentReader.getNumberOfPages();
+	}
+	
+	public void setTransition(int page, int type, int tduration, int pduration) {
+		if (transitionValues == null) {
+			transitionValues = new int[getPageCount()][3];
+		}
+		transitionValues[page-1][0] = type;
+		transitionValues[page-1][1] = tduration;
+		transitionValues[page-1][2] = pduration;
+	}
+	
+	public void setViewerPreferences(int simplePrefs, Map<PdfName, PdfObject> optionalPrefs) {
+		this.optionalViewerPreferences = optionalPrefs;
+		this.simpleViewerPreferences = simplePrefs;
+	}
+
+	public void addFile(File f) {
+		if (attachments == null) attachments = new ArrayList<File>();
+		attachments.add(f);
+	}
+
+	public void setSignature(File keystoreFile,String alias, char[] password, int certificationLevel,  boolean visible) throws IOException {		
+		try {
+			KeyStore ks = KeyStore.getInstance("JKS");
+			ks.load(new FileInputStream(keystoreFile), password);
+			key = (PrivateKey)ks.getKey(alias, password);
+			certChain = ks.getCertificateChain(alias);
+			this.certificationLevel = certificationLevel;
+			this.sigVisible = visible;
+		} catch (GeneralSecurityException ex) {
+			IOException ioe = new IOException(ex.toString());
+			ioe.initCause(ex);
+			throw ioe;
 		}
 	}
 }

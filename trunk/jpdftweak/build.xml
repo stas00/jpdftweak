@@ -64,4 +64,20 @@
 			<arg value="@jpdftweak.pro"/>
 		</java>
 	</target>
+	
+	<target name="dist" depends="jar, staticjar">
+		<copy todir="dist/src">
+			<fileset dir="." includes="build.xml,jpdftweak.bat,jpdftweak.pro,*.txt,manual/**,src/**,lib/README,lib/itext.diff"/>
+		</copy>
+		<copy todir="dist/bin">
+			<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
+		</copy>
+		<copy todir="dist/nolib">
+			<fileset dir="dist/bin" excludes="lib/*.jar"/>
+		</copy>
+		<copy todir="dist/compact">
+			<fileset dir="dist/bin" excludes="jpdftweak.jar"/>
+		</copy>
+		<copy file="jpdftweak-static.jar" tofile="dist/compact/jpdftweak.jar"/>		
+	</target>
 </project>

@@ -2,6 +2,7 @@ package jpdftweak.gui.tabs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -10,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
@@ -32,9 +34,13 @@ public class EncryptSignTab extends Tab {
 	private JTextField ownerPassword, userPassword;
 	private JCheckBox[] permissionBoxes = new JCheckBox[PdfTweak.permissionBits.length];
 
+	private JCheckBox sigVisible;
+	private JTextField keystore, alias;
+	private JPasswordField keyPassword;
+	private JComboBox certLevel;
 
 	public EncryptSignTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		this.mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		this.add(encryptDocument = new JCheckBox("Encrypt PDF"), cc.xyw(1,1,2));
@@ -65,7 +71,21 @@ public class EncryptSignTab extends Tab {
 		updateEncryptionControls();
 		this.add(new JSeparator(), cc.xyw(1,7,3));
 		this.add(signDocument = new JCheckBox("Sign PDF"), cc.xyw(1,8,3));
-		signDocument.setEnabled(false); //TODO 
+		signDocument.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateSignatureControls();
+			}
+		});
+		add(new JLabel("Keystore file:"), cc.xy(1, 9));
+		add(keystore = new JTextField(new File(System.getProperty("user.home"),".keystore").getAbsolutePath()), cc.xyw(2, 9, 2));
+		add(new JLabel("Alias:"), cc.xy(1, 10));
+		add(alias = new JTextField("mykey"), cc.xyw(2, 10, 2));
+		add(new JLabel("Passphrase:"), cc.xy(1, 11));
+		add(keyPassword = new JPasswordField(""), cc.xyw(2, 11, 2));
+		add(new JLabel("Certification level"), cc.xy(1, 12));
+		add(certLevel = new JComboBox(new String[] {"Not certified", "No changes allowed", "Form filling allowed", "Form filling and annotations allowed"}), cc.xyw(2, 12, 2));
+		add(sigVisible = new JCheckBox("Show signature on page 1"), cc.xyw(1, 13,3));
+		updateSignatureControls();
 	}
 
 	protected void loadEncryptionData() {
@@ -93,6 +113,15 @@ public class EncryptSignTab extends Tab {
 			permissionBoxes[i].setEnabled(b);
 		}
 	}
+	
+	private void updateSignatureControls() {
+		boolean b = signDocument.isSelected();
+		sigVisible.setEnabled(b);
+		keystore.setEnabled(b);
+		alias.setEnabled(b);
+		keyPassword.setEnabled(b);
+		certLevel.setEnabled(b);
+	}
 
 	@Override
 	public String getTabName() {
@@ -113,7 +142,7 @@ public class EncryptSignTab extends Tab {
 					userPassword.getText().getBytes("ISO-8859-1"));
 		}
 		if (signDocument.isSelected()) {
-			throw new IOException("Not implemented yet"); //TODO
+			tweak.setSignature(new File(keystore.getText()), alias.getText(), keyPassword.getPassword(), certLevel.getSelectedIndex(), sigVisible.isSelected());
 		}
 		return tweak;
 	}

@@ -30,14 +30,17 @@ import jpdftweak.core.PageDimension;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfPageRange;
 import jpdftweak.core.PdfTweak;
+import jpdftweak.gui.tabs.BookmarkTab;
 import jpdftweak.gui.tabs.DocumentInfoTab;
 import jpdftweak.gui.tabs.DummyTab;
 import jpdftweak.gui.tabs.EncryptSignTab;
 import jpdftweak.gui.tabs.InputTab;
+import jpdftweak.gui.tabs.InteractionTab;
 import jpdftweak.gui.tabs.OutputTab;
 import jpdftweak.gui.tabs.PageSizeTab;
 import jpdftweak.gui.tabs.ShuffleTab;
 import jpdftweak.gui.tabs.Tab;
+import jpdftweak.gui.tabs.WatermarkTab;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -46,16 +49,17 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class MainForm extends JFrame {
 
+	private InputTab inputTab = new InputTab(this);
+	
 	private Tab[] tabs = {
-			new InputTab(this),
+			inputTab,
 			new PageSizeTab(this),
-			new DummyTab("Watermark"),
+			new WatermarkTab(this),
 			new ShuffleTab(this),
-			new DummyTab("Bookmarks"),
-			new DummyTab("Attachments"),
-			new DummyTab("Interaction"),
+			new BookmarkTab(this),
+			new AttachmentTab(this),
+			new InteractionTab(this),
 			new DocumentInfoTab(this),
-			new DummyTab("Misc"),
 			new EncryptSignTab(this),
 			new OutputTab(this),
 	};
@@ -132,5 +136,9 @@ public class MainForm extends JFrame {
 	
 	public void setInputFile(PdfInputFile inputFile) {
 		this.inputFile = inputFile;
+	}
+	
+	public InputTab getInputTab() {
+		return inputTab;
 	}
 }
