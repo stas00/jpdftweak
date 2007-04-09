@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<style type="text/css">
+body {font-family: verdana,arial,sans-serif;}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<title>jPDF Tweak Documentation</title>
+</head><body>
+
+<h1>jPDF Tweak Documentation</h1>
+
+<p>This documentation is still incomplete. But it should mention the
+  strangest things in jPDF Tweak. If you want to help improving it,
+  <a href="mailto:schierlm@users.sourceforge.net">contact the author</a>.</p>
+<h2>System Requirements</h2>
+
+<p>You will need Java 5 or higher to run jPDF tweak.</p>
+
+<h2>Starting</h2>
+
+<p>Start jPDF Tweak by running jpdftweak.bat, double-clicking jpdftweak.jar
+or running</p>
+
+<p><tt>java -jar jpdftweak.jar</tt></p>
+
+<p>at the command line.</p>
+
+<h2>The Main Window</h2>
+
+<p>The main window is divided into multiple tabs. You can select
+  options from as many tabs as you need. Press <b>Run</b> when you are
+  finished setting options.</p>
+
+<h3>The Input Tab</h3>
+<p><img src="shot01.png" width="713" height="544" alt="Input Options"></p>
+
+<p>Select an input file to manipulate. If you want to combine multiple
+  files, check the checkbox and add more files. They will end up in
+  the box below, where you can select pages and/or reorder them. Click
+  Add in the lower left corner to add another entry for a file already
+  used.</p>
+
+<p>If the file is encrypted, you will need the owner password to
+  decrypt it. Yes, I know, it is <i>possible</i> to decrypt by using
+  the user password only, but it is not <i>allowed</i> to do so.</p>
+
+<p>All page numbers start with 1 (like normal people count), not with 0
+  (like programmers count).</p>
+
+<h3>The Page Size Tab</h3>
+<p><img src="shot02.png" width="713" height="544" alt="Page Size Options"></p>
+
+<p><b>Rotate Pages</b>: If you have a PDF that has both Portrait and Landscape pages, and
+  your printer has problems in printing both, you can rotate the pages
+  so that they are all Portrait or Landscape afterwards. Of course,
+  you can use this option as well to rotate all pages.</p>
+<p><b>Remove implicit page rotation</b>: PDF knows two ways of
+  rotating pages; rotating the content or rotating the media
+  (implicitly) . Some tools have problems with rotated media, so you
+  can change all Media rotations to content rotations with this
+  option (The option above creates media rotation as well). jPDF Tweak
+  should work with rotated media as well. If you have problem with
+  rotated pages, try checking this option and, if it helps, report a
+  bug.</p>
+
+<p><b>Scale pages</b>: Useful if your PDF contains pages of different
+  size. Some tools (like the <i>Shuffle</i> tab of this tool) require
+  pages of equal size. Use this option to scale all pages to the same
+  size. Of course, you can use this option as well if all pages are of
+  equal size. In that case, you might as well use the scale option of
+  your PDF viewer program.</p>
+
+<p><b>PostScript points</b>: A 
+<a href="http://en.wikipedia.org/wiki/Point_(typography)">PostScript
+  point</a> is the 72th of an inch.</p>
+
+<p><b>Center instead of enlarging</b>: Use this option if the new page
+  size is larger than the old one and the pages should be centered
+  instead of enlarged.</p>
+
+<p><b>Do not preserve aspect ratio</b>: Causes funnily stretched pages
+  if the aspect ratio has changed.</p>
+
+
+<h3>The Watermark Tab</h3>
+<p><img src="shot03.png" width="713" height="544" alt="Watermark Options"></p>
+
+<p>Here you can add two kinds of watermarks and page numbers. The text
+  watermark appears on top of the content, the PDF watermark on
+  bottom. So if your PDF pages are completely filled (maybe even with
+  white color), you won't see a
+  PDF watermark.</p>
+
+<p>Text watermark and page numbers use the built-in Helvetica font
+  (similar to Arial on Windows systems).</p>
+
+<h3>The Shuffle/N-up Tab</h3>
+<p><img src="shot04.png" width="713" height="544" alt="Shuffle/N-up Options"></p>
+
+<p>This might be the most powerful, and the most complex tab. Choose
+  a preset and stick with it <tt>:-)</tt></p>
+
+<p>If you want to build a config yourself: First specify how many
+  pages each pass (each use of the template) covers. If you select 4
+  here, and your PDF has 21 pages, it will be run 6 times (5 times
+  with 4 pages each, and once with the last page). If you give a
+  negative number, you can take half of the pages from the end of the
+  document instead of from the beginning. This is useful for booklet
+  layouts.</p>
+
+<p> Use positive page numbers like "+2" to refer to the second page of the
+  template, and negative page numbers like "-3" to refer to the third
+  page of the "opposite" template (i.e. the one if you process the
+  file from end instead of from beginning). An absolute number without
+  sign (like "2") refers to the same absolute page (i.e the second
+  page of the file).</p>
+
+<p>For the offsets and factors: Just tweak them until it looks correct
+  in the preview. If you rotate a page and it is gone, this is most
+  likely caused by the fact the the rotation used the lower left
+  corner as center point and not the center of the page.</p>
+<p>Uncheck the <b>NewPageBefore</b> to put more than one source page
+  onto one destination page.</p>
+<p>Yes, creating a config with both positive and negative numbers can
+  be confusing. For a test, you might add huge page numbers to your
+  document (see previous tab) so you can see quickly if your config is
+  correct.</p>
+
+<h3>The Bookmarks Tab</h3>
+<p><img src="shot05.png" width="713" height="544" alt="Bookmark Options"></p>
+
+<p>Here you can tweak chapter bookmarks. If you selected more than one
+input file, chapter bookmarks will be combined automatically. But if
+you select individual pages or ranges instead of the full document,
+you will have to tweak the bookmarks manually.</p>
+
+<h3>The Attachments Tab</h3>
+<p><img src="shot06.png" width="713" height="544" alt="Attachment Options"></p>
+
+<p>Here you can add attachments and remove files you erroneously
+  attached before. This view does not show which files have been
+  attached to the original document. If you need them, use your PDF
+  viewer to save them and reattach them if necessary.</p>
+
+<h3>The Interaction Tab</h3>
+<p><img src="shot07.png" width="713" height="544" alt="Interaction Options"></p>
+
+<p>This tab is interesting. When a PDF file is shown in full screen
+  mode, pages can flip automatically and/or with a nice effect. Select
+  effects and/or durations (durations are in seconds) on the left. You
+  can set viewer preferences (how the document should be opened) on
+  the right.</p>
+
+<h3>The Document Info Tab</h3>
+<p><img src="shot08.png" width="713" height="544" alt="Document Info Options"></p>
+
+<p>Here you can add information to the document info dictionary (shown
+  when you open "Document summary"</p>
+
+
+<h3>The Encrypt/Sign Tab</h3>
+<p><img src="shot09.png" width="713" height="544" alt="Encrypt/Sign Options"></p>
+
+<p>Encrypting is quite standard nowadays, so I won't write much
+  here. If you know the owner password, you may do everything with the
+  document; if you know only the user password, you may only do things
+  checked below. The user password may be empty, the owner password
+  may not (but you can use the same password for both if desired).</p>
+
+<p>Signing is a bit more tricky, since you need a key and a
+  certificate for this to be useful. Import that key into a Java
+  KeyStore (using Sun's <tt>keytool</tt> tool), and you can use it
+  from here.</p>
+
+<h3>The Output Tab</h3>
+<p><img src="shot10.png" width="713" height="544" alt="Output Options"></p>
+
+<p>Don't forget this tab! Select an output filename here.</p>
+
+<p>You may optionally burst the document into single page PDFs. Note
+  that not all features (like bookmarks, transitions or viewer
+  preferences) make sense when you burst a document.</p>
+
+<p>When you save a document uncompressed, you can add page marks
+  (compatible to pdftk's page marks) to find pages easier in the PDF
+  source code. Search for "pdftk_PageNum" in the uncompressed
+  PDF to find a page. When you compress a PDF again, you can remove
+  these marks.</p>
+<hr>
+&copy; 2007 Michael Schierl
+</body></html>
+
+
+
+
+
+
+
+
+
+

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -21,6 +22,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.lowagie.text.DocumentException;
 
+import jpdftweak.core.PdfBookmark;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfPageRange;
 import jpdftweak.core.PdfTweak;
@@ -165,6 +167,28 @@ public class InputTab extends Tab {
 		} else {
 			inputFiles.get(0).reopen();
 			return new PdfTweak(inputFiles.get(0));
+		}
+	}
+
+
+	public List<PdfBookmark> loadBookmarks() {
+		if (inputFiles.size() == 0) 
+			return new ArrayList<PdfBookmark>();
+		if (multiFiles.isSelected()) {
+			List<PdfPageRange> ranges = new ArrayList<PdfPageRange>();
+			for(int i=0; i <fileCombination.getRowCount(); i++) {
+				Object[] row = fileCombination.getRow(i);
+				if (row[0] == null) continue;
+				PdfInputFile ifile = (PdfInputFile)row[0];
+				int from = (Integer)row[1];
+				int to = (Integer)row[2];
+				boolean odd = (Boolean)row[3];
+				boolean even = (Boolean)row[4];
+				ranges.add(new PdfPageRange(ifile, from, to, odd, even));
+			}
+			return PdfBookmark.buildBookmarks(ranges);			
+		} else {
+			return inputFiles.get(0).getBookmarks(1);
 		}
 	}
 

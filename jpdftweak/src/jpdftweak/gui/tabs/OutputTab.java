@@ -2,6 +2,7 @@ package jpdftweak.gui.tabs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -31,6 +32,7 @@ public class OutputTab extends Tab {
 		CellConstraints cc = new CellConstraints();
 		this.add(new JLabel("Filename:"), cc.xy(1,1));
 		this.add(outputFile = new JTextField(""), cc.xy(2, 1));
+		outputFile.setEditable(false);
 		JButton selectFile;
 		this.add(selectFile = new JButton("..."), cc.xy(3, 1));
 		selectFile.addActionListener(new ActionListener() {
@@ -39,13 +41,15 @@ public class OutputTab extends Tab {
 				if (pdfChooser.showSaveDialog(mainForm) != JFileChooser.APPROVE_OPTION) {
 					return;
 				}
-				if (pdfChooser.getSelectedFile().exists()) {
+				String filename = pdfChooser.getSelectedFile().getAbsolutePath();
+				if (!filename.toLowerCase().endsWith(".pdf")) filename += ".pdf";
+				if (new File(filename).exists()) {
 					if (JOptionPane.showConfirmDialog (mainForm,
 							"Overwrite existing file?","Confirm Overwrite",
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) return;
 				}
-				outputFile.setText(pdfChooser.getSelectedFile().getAbsolutePath());
+				outputFile.setText(filename);
 			}
 		});
 		this.add(burst = new JCheckBox("Burst pages (use * in file name as wildcard for page number)"), cc.xyw(1, 2, 3));

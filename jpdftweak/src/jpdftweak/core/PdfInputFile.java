@@ -4,8 +4,10 @@ import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.lowagie.text.pdf.PdfCopy;
@@ -15,6 +17,7 @@ import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.SimpleBookmark;
 
 public class PdfInputFile {
 	private final File file;
@@ -100,5 +103,11 @@ public class PdfInputFile {
 		byte[] userPwd = rdr.computeUserPassword();
 		if (userPwd == null) return "";
 		return new String(userPwd);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PdfBookmark> getBookmarks(int initialDepth) {
+		List bmk = SimpleBookmark.getBookmark(rdr);
+		return PdfBookmark.parseBookmarks(bmk, initialDepth);
 	}
 }
