@@ -1,21 +1,17 @@
 package jpdftweak.core;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.lowagie.text.pdf.PdfCopy;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.SimpleBookmark;
 
@@ -77,7 +73,12 @@ public class PdfInputFile {
 				PdfDictionary infoDic = (PdfDictionary) info;
 				for (Object key_ : infoDic.getKeys()) {
 					PdfName key = (PdfName) key_;
-					result.put(key.toString().substring(1), infoDic.get(key).toString());
+					String value = infoDic.get(key).toString();
+					if (infoDic.get(key) instanceof PdfString) {
+						PdfString s = (PdfString) infoDic.get(key);
+						value = s.toUnicodeString();						
+					}
+					result.put(key.toString().substring(1), value);
 				}
 			}
 		}
