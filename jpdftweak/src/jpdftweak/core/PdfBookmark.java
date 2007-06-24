@@ -115,6 +115,7 @@ public class PdfBookmark {
 	
 	protected static List<PdfBookmark> parseBookmarks(List<HashMap> bookmarks, int depth) {
 		List<PdfBookmark> result = new ArrayList<PdfBookmark>();
+		if (bookmarks == null) return result;
 		for(HashMap bookmark : bookmarks) {
 			fillInBookmark(result, bookmark, depth);
 		}
