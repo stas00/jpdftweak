@@ -1,4 +1,4 @@
-package jpdftweak.gui;
+package jpdftweak.gui.tabs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -11,10 +11,10 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 
-import com.lowagie.text.DocumentException;
-
 import jpdftweak.core.PdfTweak;
-import jpdftweak.gui.tabs.Tab;
+import jpdftweak.gui.MainForm;
+
+import com.lowagie.text.DocumentException;
 
 public class AttachmentTab extends Tab {
 

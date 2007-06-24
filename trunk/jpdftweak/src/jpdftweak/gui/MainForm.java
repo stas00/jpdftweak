@@ -1,38 +1,22 @@
 package jpdftweak.gui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
-import jpdftweak.core.PageDimension;
 import jpdftweak.core.PdfInputFile;
-import jpdftweak.core.PdfPageRange;
 import jpdftweak.core.PdfTweak;
+import jpdftweak.gui.tabs.AttachmentTab;
 import jpdftweak.gui.tabs.BookmarkTab;
 import jpdftweak.gui.tabs.DocumentInfoTab;
-import jpdftweak.gui.tabs.DummyTab;
 import jpdftweak.gui.tabs.EncryptSignTab;
 import jpdftweak.gui.tabs.InputTab;
 import jpdftweak.gui.tabs.InteractionTab;
@@ -45,7 +29,6 @@ import jpdftweak.gui.tabs.WatermarkTab;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfWriter;
 
 public class MainForm extends JFrame {
 
