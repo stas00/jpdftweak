@@ -105,7 +105,7 @@ public class ShuffleTab extends Tab {
 				parseGUI();
 			}
 		});
-		panel1.add(shuffleRulesTable = new TableComponent(new String[]{"Page", "OffsetX", "OffsetY", "ScaleFactor", "Rotate", "NewPageBefore"}, new Class[] {String.class, String.class, String.class,  Double.class, String.class, Boolean.class}, new Object[] {"+1", "0%", "0%", 1.0, "None", true}), cc.xyw(1, 6, 4));
+		panel1.add(shuffleRulesTable = new TableComponent(new String[]{"Page", "OffsetX", "OffsetY", "ScaleFactor", "Rotate", "NewPageBefore", "FrameWidth"}, new Class[] {String.class, String.class, String.class,  Double.class, String.class, Boolean.class, Double.class}, new Object[] {"+1", "0%", "0%", 1.0, "None", true, 0}), cc.xyw(1, 6, 4));
 		JComboBox rotateValues = new JComboBox(new String[] {"None", "Left", "Upside-Down", "Right"});
 		shuffleRulesTable.getTable().getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(rotateValues));
 		shuffleRulesTable.getScrollPane().setPreferredSize(new Dimension(400, 100));
@@ -144,7 +144,8 @@ public class ShuffleTab extends Tab {
 				double scale = (Double) row[3];
 				char rotate = ((String)row[4]).charAt(0);
 				boolean npb = (Boolean)row[5];
-				ShuffleRule rule = new ShuffleRule(npb, pb, page, rotate, scale, ox, oxp, oy, oyp);
+				double fw = (Double) row[6];
+				ShuffleRule rule = new ShuffleRule(npb, pb, page, rotate, scale, ox, oxp, oy, oyp, fw);
 				if (i > 0) sb.append(",");
 				sb.append(rule.toString());
 			}
@@ -174,7 +175,7 @@ public class ShuffleTab extends Tab {
 		pagesPerPass.setText(""+pages);
 		shuffleRulesTable.clear();
 		for (int i = 0; i < rules.length; i++) {
-			shuffleRulesTable.addRow(rules[i].getPageString(), rules[i].getOffsetXString(), rules[i].getOffsetYString(), rules[i].getScale(), rotateName(rules[i].getRotate()), rules[i].isNewPageBefore());
+			shuffleRulesTable.addRow(rules[i].getPageString(), rules[i].getOffsetXString(), rules[i].getOffsetYString(), rules[i].getScale(), rotateName(rules[i].getRotate()), rules[i].isNewPageBefore(), rules[i].getFrameWidth());
 		}
 		shufflePagesPerPass = pages;
 		shuffleRules = rules;	

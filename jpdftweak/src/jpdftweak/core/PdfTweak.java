@@ -366,6 +366,11 @@ public class PdfTweak {
 				if (pg <= cnt) {
 					page = writer.getImportedPage(currentReader, pg);
 					cb.addTemplate(page, a, b, c, d, e, f);
+					if (sr.getFrameWidth() > 0) {
+						cb.setLineWidth((float)sr.getFrameWidth());
+						cb.rectangle(e, f, a*size.width()+c*size.height(), b*size.width()+d*size.height());
+						cb.stroke();
+					}
 				} else {
 					document.add(Chunk.NEWLINE);
 				}

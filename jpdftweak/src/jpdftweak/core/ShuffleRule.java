@@ -15,6 +15,7 @@ public class ShuffleRule {
 	private final boolean offsetXPercent;
 	private final double offsetY;
 	private final boolean offsetYPercent;
+	private final double frameWidth;
 
 	public static enum PageBase {
 		ABSOLUTE, BEGINNING, END
@@ -38,7 +39,7 @@ public class ShuffleRule {
 		"1:!+1N0.25+150.0%+300.0%,+1L0.25+250.0%-100.0%,+1U0.25-250.0%-100.0%,+1R0.25-350.0%+183.0%=Star Test Pattern",
 	};
 	
-	public ShuffleRule(boolean newPageBefore, PageBase pageBase, int pageNumber, char rotate, double scale, double offsetX, boolean offsetXPercent, double offsetY, boolean offsetYPercent) {
+	public ShuffleRule(boolean newPageBefore, PageBase pageBase, int pageNumber, char rotate, double scale, double offsetX, boolean offsetXPercent, double offsetY, boolean offsetYPercent, double frameWidth) {
 		if ("NRLU".indexOf(rotate) == -1) throw new IllegalArgumentException(""+rotate);
 		if (pageNumber == 0) throw new IllegalArgumentException();
 		this.newPageBefore = newPageBefore;
@@ -50,6 +51,7 @@ public class ShuffleRule {
 		this.offsetXPercent = offsetXPercent;
 		this.offsetY = offsetY;
 		this.offsetYPercent = offsetYPercent;
+		this.frameWidth = frameWidth;
 	}
 	
 	public boolean isNewPageBefore() {
@@ -108,12 +110,13 @@ public class ShuffleRule {
 
 	public String toString() {
 		return (newPageBefore?"!":"")+getPageString()+rotate+scale+
-			getOffsetXString()+getOffsetYString();
+			getOffsetXString()+getOffsetYString()+
+			(frameWidth == 0 ? "" : "F"+frameWidth);
 	}
 
 
 	public static ShuffleRule parseRule(String rule) {
-		Pattern p = Pattern.compile("(\\!?)([-+]?)([0-9]+)([NRLU])([0-9.]+)([+-][0-9.]+)(%?)([+-][0-9.]+)(%?)");
+		Pattern p = Pattern.compile("(\\!?)([-+]?)([0-9]+)([NRLU])([0-9.]+)([+-][0-9.]+)(%?)([+-][0-9.]+)(%?)((F[0-9.]+)?)");
 		Matcher m = p.matcher(rule);
 		if (!m.matches()) throw new NumberFormatException(rule);
 		return new ShuffleRule(m.group(1).length()==1, 
@@ -124,7 +127,8 @@ public class ShuffleRule {
 				Double.parseDouble(m.group(6)),
 				m.group(7).length() == 1,
 				Double.parseDouble(m.group(8)),
-				m.group(9).length() == 1);
+				m.group(9).length() == 1,
+				m.group(10).length()==0 ? 0 : Double.parseDouble(m.group(11).substring(1)));
 	}
 
 	public int getRotateAngle() {
@@ -152,5 +156,9 @@ public class ShuffleRule {
 		if (!rules[0].isNewPageBefore()) throw new NumberFormatException("First rule must have new page before");
 		out_passLength[0] = pages;
 		return rules;
+	}
+
+	public double getFrameWidth() {
+		return frameWidth;
 	}
 }
