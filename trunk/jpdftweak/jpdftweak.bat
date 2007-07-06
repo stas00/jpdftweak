@@ -1,1 +1,1 @@
-@java -jar jpdftweak.jar
+@java -jar jpdftweak.jar %*
