@@ -23,7 +23,7 @@ public class PdfPageRange {
 	}
 
 	public int[] getPages() {
-		int[] pages = new int[Math.abs(to-from+1)];
+		int[] pages = new int[Math.abs(to-from)+1];
 		int length = 0;
 		for(int i=from; ; i+= from > to ? -1 : 1) {
 			if ((i % 2 == 0 && includeEven) ||
