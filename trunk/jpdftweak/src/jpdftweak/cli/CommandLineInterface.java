@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import com.lowagie.text.DocumentException;
 
-
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfPageRange;
 import jpdftweak.core.PdfTweak;

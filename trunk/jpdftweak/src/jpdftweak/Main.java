@@ -1,12 +1,8 @@
 package jpdftweak;
 
-import java.io.File;
-
 import javax.swing.UIManager;
 
 import jpdftweak.cli.CommandLineInterface;
-import jpdftweak.core.PdfInputFile;
-import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
 
 public class Main {

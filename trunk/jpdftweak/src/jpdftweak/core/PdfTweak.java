@@ -88,7 +88,6 @@ public class PdfTweak {
 	
 	private static final String PDFTK_PAGE_MARKER= "pdftk_PageNum";
 
-
 	private PdfReader currentReader;
 	private int encryptionMode = -1, encryptionPermissions = -1;
 	private byte[] userPassword = null;
@@ -246,7 +245,7 @@ public class PdfTweak {
 			int rotation = currentReader.getPageRotation(i);
 			Rectangle r = currentReader.getPageSizeWithRotation(i);
 			int count;
-			if (r.width() > r.height()) { // landscape
+			if (r.getWidth() > r.getHeight()) { // landscape
 				count = landscapeCount;
 			} else {
 				count = portraitCount;
@@ -270,7 +269,7 @@ public class PdfTweak {
 		PdfImportedPage page;
 		for (int i = 1; i <= currentReader.getNumberOfPages(); i++) {
 			Rectangle currentSize = currentReader.getPageSizeWithRotation(i);
-			currentSize = new Rectangle(currentSize.width(), currentSize.height()); // strip rotation
+			currentSize = new Rectangle(currentSize.getWidth(), currentSize.getHeight()); // strip rotation
 			document.setPageSize(currentSize);
 			if (cb == null) {
 				document.open();
@@ -283,11 +282,11 @@ public class PdfTweak {
 			if (rotation == 0) {
 				cb.addTemplate(page, 1, 0, 0, 1, 0, 0);
 			} else if (rotation == 90) {
-				cb.addTemplate(page, 0, -1, 1, 0, 0, currentSize.height());
+				cb.addTemplate(page, 0, -1, 1, 0, 0, currentSize.getHeight());
 			} else if (rotation == 180) {
-				cb.addTemplate(page, -1, 0, 0, -1, currentSize.width(), currentSize.height());
+				cb.addTemplate(page, -1, 0, 0, -1, currentSize.getWidth(), currentSize.getHeight());
 			} else if (rotation == 270) {
-				cb.addTemplate(page, 0, 1, -1, 0, currentSize.width(), 0);
+				cb.addTemplate(page, 0, 1, -1, 0, currentSize.getWidth(), 0);
 			} else {
 				throw new IOException("Unparsable rotation value: "+rotation);
 			}
@@ -310,8 +309,8 @@ public class PdfTweak {
 			document.newPage();
 			Rectangle currentSize = currentReader.getPageSizeWithRotation(i);
 			if(currentReader.getPageRotation(i) != 0) throw new RuntimeException(""+currentReader.getPageRotation(i));
-			float factorX = newSize.width() / currentSize.width();
-			float factorY = newSize.height() / currentSize.height();
+			float factorX = newSize.getWidth() / currentSize.getWidth();
+			float factorY = newSize.getHeight() / currentSize.getHeight();
 			if (noEnlarge) {
 				if (factorX > 1) factorX=1;
 				if (factorY>1) factorY=1;
@@ -320,8 +319,8 @@ public class PdfTweak {
 				factorX = Math.min(factorX, factorY);
 				factorY = factorX;
 			}
-			offsetX = (newSize.width() - (currentSize.width() * factorX)) / 2f;
-			offsetY = (newSize.height() - (currentSize.height() * factorY)) / 2f;
+			offsetX = (newSize.getWidth() - (currentSize.getWidth() * factorX)) / 2f;
+			offsetY = (newSize.getHeight() - (currentSize.getHeight() * factorY)) / 2f;
 			page = writer.getImportedPage(currentReader, i);
 			cb.addTemplate(page, factorX, 0, 0, factorY, offsetX, offsetY);
 		}
@@ -334,8 +333,8 @@ public class PdfTweak {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		Rectangle size = currentReader.getPageSize(1);
 		for (int i = 1; i <= currentReader.getNumberOfPages(); i++) {
-			if (currentReader.getPageSize(i).width() != size.width() ||
-					currentReader.getPageSize(i).height() != size.height()) {
+			if (currentReader.getPageSize(i).getWidth() != size.getWidth() ||
+					currentReader.getPageSize(i).getHeight() != size.getHeight()) {
 				throw new IOException("Pages must have equals sizes to be shuffled. Use the Scale option on the PageSize tab first.");
 			}
 			if (currentReader.getPageRotation(i) != 0) throw new RuntimeException();
@@ -360,8 +359,8 @@ public class PdfTweak {
 				float s = (float)sr.getScale();
 				float offsetx = (float)sr.getOffsetX();
 				float offsety = (float)sr.getOffsetY();
-				if (sr.isOffsetXPercent()) { offsetx = offsetx * size.width()/100;}
-				if (sr.isOffsetXPercent()) { offsety = offsety * size.height()/100;}
+				if (sr.isOffsetXPercent()) { offsetx = offsetx * size.getWidth()/100;}
+				if (sr.isOffsetXPercent()) { offsety = offsety * size.getHeight()/100;}
 				float a, b, c, d, e, f;
 				switch(sr.getRotate()) {
 				case 'N': 
@@ -388,7 +387,7 @@ public class PdfTweak {
 					cb.addTemplate(page, a, b, c, d, e, f);
 					if (sr.getFrameWidth() > 0) {
 						cb.setLineWidth((float)sr.getFrameWidth());
-						cb.rectangle(e, f, a*size.width()+c*size.height(), b*size.width()+d*size.height());
+						cb.rectangle(e, f, a*size.getWidth()+c*size.getHeight(), b*size.getWidth()+d*size.getHeight());
 						cb.stroke();
 					}
 				} else {
@@ -452,7 +451,7 @@ public class PdfTweak {
 	    	  PdfContentByte overContent = stamper.getOverContent(i);
     		  Rectangle size = currentReader.getPageSizeWithRotation(i);
 	    	  if (wmText != null) {
-	    		  float angle = (float) Math.atan(size.height() / size.width());
+	    		  float angle = (float) Math.atan(size.getHeight() / size.getWidth());
 	    		  float m1 = (float) Math.cos(angle);
 	    		  float m2 = (float) - Math.sin(angle);
 	    		  float m3 = (float) Math.sin(angle);
@@ -467,8 +466,8 @@ public class PdfTweak {
 	    		  overContent.setGState(gs1);
 	    		  overContent.beginText();
 	    		  overContent.setFontAndSize(bf, wmSize);
-	    		  overContent.setTextMatrix(m1, m2, m3, m4, xoff + size.width() / 2,
-	    				  yoff + size.height() / 2);
+	    		  overContent.setTextMatrix(m1, m2, m3, m4, xoff + size.getWidth() / 2,
+	    				  yoff + size.getHeight() / 2);
 	    		  overContent.showText(wmText);
 	    		  overContent.endText();
 	    		  overContent.restoreState();
@@ -476,8 +475,8 @@ public class PdfTweak {
 	    	  if (pnPosition != -1) {
 	    		  overContent.beginText();
 	    		  overContent.setFontAndSize(bf, pnSize);
-	    		  float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.width() * (pnPosition % 3) / 2.0f;
-	    		  float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.height() * (pnPosition / 3) / 2.0f;
+	    		  float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.getWidth() * (pnPosition % 3) / 2.0f;
+	    		  float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.getHeight() * (pnPosition / 3) / 2.0f;
 	    		  overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, ""+i, xx, yy, 0);
 	    		  overContent.endText();
 	    	  }

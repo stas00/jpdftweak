@@ -29,7 +29,6 @@ public class InfoOption implements CommandOption {
 		return true;
 	}
 
-
 	public void run(PdfTweak tweak, PdfInputFile masterFile)
 	throws IOException, DocumentException {
 		if ("-".equals(infoFilename)) {
@@ -67,16 +66,16 @@ public class InfoOption implements CommandOption {
 				int lastChange=0;
 				for(int i=1; i<=file.getPageCount(); i++) {
 					Rectangle current = file.getPageSize(i);
-					if (current.width() != lastPage.width() || current.height() != lastPage.height()) {
+					if (current.getWidth() != lastPage.getWidth() || current.getHeight() != lastPage.getHeight()) {
 						if (lastChange != 0) {
-							w.write("PAGESIZE "+lastChange+"-"+i+" "+lastPage.width()+"x"+lastPage.height()); w.newLine();
+							w.write("PAGESIZE "+lastChange+"-"+i+" "+lastPage.getWidth()+"x"+lastPage.getHeight()); w.newLine();
 						}
 						lastPage = current;
 						lastChange=i;
 					}
 				}
 				if (lastChange != 0) {
-					w.write("PAGESIZE "+lastChange+"-"+file.getPageCount()+" "+lastPage.width()+"x"+lastPage.height()); w.newLine();
+					w.write("PAGESIZE "+lastChange+"-"+file.getPageCount()+" "+lastPage.getWidth()+"x"+lastPage.getHeight()); w.newLine();
 				}
 			}
 		}

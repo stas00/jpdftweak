@@ -37,7 +37,6 @@ public class PdfBookmark {
 		}
 	}
 
-
 	public int getDepth() {
 		return depth;
 	}

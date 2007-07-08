@@ -16,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
 import jpdftweak.core.PdfTweak;
