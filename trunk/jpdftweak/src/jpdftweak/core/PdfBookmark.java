@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PdfBookmark {
 	private final int depth;
@@ -215,5 +217,49 @@ public class PdfBookmark {
 			offset += range.getPages().length;
 		}
 		return result;
+	}
+
+	public static PdfBookmark parseBookmark(String line) {
+		Matcher m = Pattern.compile("(-?[0-9]+);(O?B?I?);([^;]*);(-?[0-9]+)( [^;]+)?(;[^;]*)?").matcher(line);
+		if (!m.matches()) throw new RuntimeException("Cannot parse bookmark");
+		String flags = m.group(2);
+		return new PdfBookmark(Integer.parseInt(m.group(1)), unescape(m.group(3)),
+				flags.contains("O"), Integer.parseInt(m.group(4)), 
+				(m.group(5) == null ? "" : unescape(m.group(5).substring(1))),
+				flags.contains("B"),flags.contains("I"), 
+				(m.group(6) == null ? null : unescape(m.group(6).substring(1))));		
+	}
+	
+	@Override
+	public String toString() {
+		return depth+";"+(open?"O":"")+(bold?"B":"")+(italic?"I":"")+";"+
+			escape(title)+";"+page+(pagePosition.length() == 0 ? "" : " ")+
+			escape(pagePosition)+(moreOptions==null ? "" : (";"+escape(moreOptions)));
+	}
+	
+	private static String escape(String str) {
+		StringBuffer sb = new StringBuffer(str.length());
+		for (int i = 0; i < str.length(); i++) {
+			if ((str.charAt(i)) <32 || "\\;\"'".contains(""+str.charAt(i))) {
+				char chr = str.charAt(i);
+				sb.append("\\").append(chr<16?"0":"").append(Integer.toHexString(chr).toUpperCase());
+			} else {
+				sb.append(str.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
+	
+	private static String unescape(String str) {
+		StringBuffer sb = new StringBuffer(str.length());
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i)=='\\') {
+				sb.append((char)Integer.parseInt(str.substring(i+1, i+3), 16));
+				i+=2;
+			} else {
+				sb.append(str.charAt(i));
+			}
+		}
+		return sb.toString();
 	}
 }

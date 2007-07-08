@@ -38,25 +38,6 @@ public class InteractionTab extends Tab {
 	private TableComponent transitions;
 	private JCheckBox addTransitions, addPrefs;
 	private JComboBox pageMode, pageLayout;
-	private String[] transitionNames = new String[] {
-			"None",
-			"Out Vertical Split",
-			"Out Horizontal Split",
-			"In Vertical Split",
-			"In Horizontal Split",
-			"Vertical Blinds",
-			"Vertical Blinds",
-			"Inward Box",
-			"Outward Box",
-			"Left-Right Wipe",
-			"Right-Left Wipe",
-			"Bottom-Top Wipe",
-			"Top-Bottom Wipe",
-			"Dissolve",
-			"Left-Right Glitter",
-			"Top-Bottom Glitter",
-			"Diagonal Glitter",				
-	};
 	
 	public InteractionTab(MainForm mf) {
 		super(new BorderLayout());
@@ -74,7 +55,7 @@ public class InteractionTab extends Tab {
 		transitions.getScrollPane().setPreferredSize(new Dimension(200, 300));
 		TableColumn c = transitions.getTable().getColumnModel().getColumn(2);
 		c.setPreferredWidth(200);
-		c.setCellEditor(new DefaultCellEditor(new JComboBox(transitionNames)));
+		c.setCellEditor(new DefaultCellEditor(new JComboBox(PdfTweak.TRANSITION_NAMES)));
 		FormLayout fl;
 		JPanel panel2 = new JPanel(fl = new FormLayout("f:p, f:p:g", "f:p, f:p, f:p, 10dlu"));
 		CellConstraints cc = new CellConstraints();
@@ -122,7 +103,7 @@ public class InteractionTab extends Tab {
 				int from = (Integer)row[0];
 				int to = (Integer)row[1];
 				String transition = (String)row[2];
-				int trans = Arrays.asList(transitionNames).indexOf(transition);
+				int trans = Arrays.asList(PdfTweak.TRANSITION_NAMES).indexOf(transition);
 				if (trans==-1) throw new RuntimeException();
 				int duration = (Integer)row[3];
 				int pdur = (Integer)row[4];

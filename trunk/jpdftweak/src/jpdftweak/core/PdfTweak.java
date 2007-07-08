@@ -57,6 +57,26 @@ public class PdfTweak {
 		"Printing", "ModifyContents", "Copy", "ModifyAnnotations", 
 		"FillIn", "ScreenReaders", "Assembly", "HQPrinting"
 	};
+	
+	public static final String[] TRANSITION_NAMES = new String[] {
+			"None",
+			"Out Vertical Split",
+			"Out Horizontal Split",
+			"In Vertical Split",
+			"In Horizontal Split",
+			"Vertical Blinds",
+			"Vertical Blinds",
+			"Inward Box",
+			"Outward Box",
+			"Left-Right Wipe",
+			"Right-Left Wipe",
+			"Bottom-Top Wipe",
+			"Top-Bottom Wipe",
+			"Dissolve",
+			"Left-Right Glitter",
+			"Top-Bottom Glitter",
+			"Diagonal Glitter",				
+	};
 
 	public static String[] getKnownInfoNames() {
 		String[] result = new String[INFO_NAMES.length];
