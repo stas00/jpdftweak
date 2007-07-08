@@ -22,7 +22,16 @@ public class CommandLineInterface {
 	private CommandOption[] options = {
 			new RotateOption(),
 			new ScaleOption(),
-			new ShuffleOption()
+			new WatermarkOptions(),
+			new ShuffleOption(),
+			new BookmarksOption(),
+			new AttachOption(),
+			new TransitionOption(),
+			new ViewerOptions(),
+			new DocInfoOption(),
+			new EncryptOptions(),
+			new SignOptions(),
+			new InfoOption()
 	};
 	
 	public CommandLineInterface(String[] args) throws IOException, DocumentException {

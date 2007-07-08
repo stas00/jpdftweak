@@ -493,6 +493,9 @@ public class PdfTweak {
 	public void setTransition(int page, int type, int tduration, int pduration) {
 		if (transitionValues == null) {
 			transitionValues = new int[getPageCount()][3];
+			for(int i=0; i<transitionValues.length; i++) {
+				transitionValues[i][2] = -1;
+			}
 		}
 		transitionValues[page-1][0] = type;
 		transitionValues[page-1][1] = tduration;

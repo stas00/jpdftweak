@@ -21,7 +21,7 @@ public class ViewerPreference {
 		new ViewerPreference("Print area", PdfName.PRINTAREA, PdfName.MEDIABOX, PdfName.CROPBOX, PdfName.BLEEDBOX, PdfName.TRIMBOX, PdfName.ARTBOX),
 		new ViewerPreference("Print clip", PdfName.PRINTCLIP, PdfName.MEDIABOX, PdfName.CROPBOX, PdfName.BLEEDBOX, PdfName.TRIMBOX, PdfName.ARTBOX),
 		new ViewerPreference("Print scaling", PdfName.PRINTSCALING, PdfName.APPDEFAULT, PdfName.NONE),
-		new ViewerPreference("Dupley", PdfName.DUPLEX, PdfName.SIMPLEX, PdfName.DUPLEXFLIPSHORTEDGE, PdfName.DUPLEXFLIPLONGEDGE),
+		new ViewerPreference("Duplex", PdfName.DUPLEX, PdfName.SIMPLEX, PdfName.DUPLEXFLIPSHORTEDGE, PdfName.DUPLEXFLIPLONGEDGE),
 		new ViewerPreference("Pick Tray by PDF size", PdfName.PICKTRAYBYPDFSIZE, PdfBoolean.PDFTRUE, PdfBoolean.PDFFALSE),
 		new ViewerPreference("Number of copies", PdfName.NUMCOPIES, new PdfNumber(1), new PdfNumber(2), new PdfNumber(3), new PdfNumber(4), new PdfNumber(5)),
 	};

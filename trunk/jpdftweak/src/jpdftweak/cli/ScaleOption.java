@@ -50,9 +50,9 @@ public class ScaleOption implements CommandOption {
 	public String getHelp(String option) {
 		return 
 			" -scale {WIDTH},{HEIGHT}[,{OPTIONS}]\n"+
-			"   scale all pages to fit to new page size.\n"+
-			"   If {OPTIONS} includes \"c\", center pages instead of enlarging them,\n"+
-			"   \"r\" in {OPTIONS} ignores aspect ratio.\n"+
-			"   Specify {WIDTH} and {HEIGHT} in postscript points.";
+			"    Scale all pages to fit to new page size.\n"+
+			"    If {OPTIONS} includes \"c\", center pages instead of enlarging them,\n"+
+			"    \"r\" in {OPTIONS} ignores aspect ratio.\n"+
+			"    Specify {WIDTH} and {HEIGHT} in postscript points.";
 	}
 }

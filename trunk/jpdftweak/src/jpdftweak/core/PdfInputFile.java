@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfName;
@@ -49,6 +50,10 @@ public class PdfInputFile {
 
 	public int getPageCount() {
 		return rdr.getNumberOfPages();
+	}
+	
+	public Rectangle getPageSize(int page) {
+		return rdr.getPageSizeWithRotation(page);
 	}
 
 	@Override
