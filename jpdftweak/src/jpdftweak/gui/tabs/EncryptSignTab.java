@@ -93,7 +93,7 @@ public class EncryptSignTab extends Tab {
 		PdfInputFile ifile = mainForm.getInputFile();
 		int cm = ifile.getCryptoMode();
 		if (cm != -1) encryptMode.setSelectedIndex(cm);
-		noEncryptMetadata.setSelected(ifile.isMetadataEncrypted());
+		noEncryptMetadata.setSelected(!ifile.isMetadataEncrypted());
 		userPassword.setText(ifile.getUserPassword());
 		ownerPassword.setText(ifile.getOwnerPassword());
 		int permissions = ifile.getPermissions();
