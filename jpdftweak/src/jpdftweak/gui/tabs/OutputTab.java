@@ -10,15 +10,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import jpdftweak.core.PdfTweak;
+import jpdftweak.gui.MainForm;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.lowagie.text.DocumentException;
-
-import jpdftweak.core.PdfTweak;
-import jpdftweak.gui.MainForm;
 
 public class OutputTab extends Tab {
 

@@ -47,7 +47,6 @@ public class BookmarksOption implements CommandOption {
 		}
 	}
 
-
 	public String getSummary() {
 		return 
 			" -bookmark               Add PDF bookmark(s)\n"+

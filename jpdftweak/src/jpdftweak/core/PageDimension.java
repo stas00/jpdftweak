@@ -72,7 +72,7 @@ public class PageDimension {
 	}
 
 	private static void addCommonSize(int index, String name, Rectangle size) {
-		if (size.width() > size.height()) throw new RuntimeException(name);
+		if (size.getWidth() > size.getHeight()) throw new RuntimeException(name);
 		commonSizes[index*2] = new PageDimension(name+" Portrait", size, false);
 		commonSizes[index*2+1] = new PageDimension(name+" Landscape", size, true);
 	}
@@ -85,8 +85,8 @@ public class PageDimension {
 
 	public PageDimension(String name, Rectangle size, boolean rotated) {
 		this.name = name;
-		this.width = rotated ? size.height() : size.width();
-		this.height = rotated ? size.width() : size.height();
+		this.width = rotated ? size.getHeight() : size.getWidth();
+		this.height = rotated ? size.getWidth() : size.getHeight();
 	}
 
 	public float getWidth() {

@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -15,12 +14,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.DocumentException;
 
 import jpdftweak.core.PdfBookmark;
 import jpdftweak.core.PdfInputFile;
@@ -29,6 +23,10 @@ import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
 import jpdftweak.gui.PasswordInputBox;
 import jpdftweak.gui.TableComponent;
+
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+import com.lowagie.text.DocumentException;
 
 public class InputTab extends Tab {
 
@@ -86,7 +84,6 @@ public class InputTab extends Tab {
 		updateFileName();
 	}
 
-
 	private void updateFileName() {
 		String fn;
 		if (inputFiles.size() == 0) {
@@ -98,7 +95,6 @@ public class InputTab extends Tab {
 		}
 		filename.setText(fn);
 	}
-
 
 	protected void selectFile() {
 		JFileChooser pdfChooser = mf.getPdfChooser();
@@ -134,7 +130,6 @@ public class InputTab extends Tab {
 		updateFileName();
 	}
 
-
 	@Override
 	public String getTabName() {
 		return "Input";
@@ -169,7 +164,6 @@ public class InputTab extends Tab {
 			return new PdfTweak(inputFiles.get(0));
 		}
 	}
-
 
 	public List<PdfBookmark> loadBookmarks() {
 		if (inputFiles.size() == 0) 

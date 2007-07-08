@@ -71,7 +71,6 @@ public class ViewerOptions implements CommandOption {
 		}
 	}
 
-
 	public String getSummary() {
 		return 
 			" -pagemode               Set page mode (viewer preference)\n"+

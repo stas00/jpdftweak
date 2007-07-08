@@ -4,23 +4,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.DocumentException;
 
 import jpdftweak.core.PageDimension;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
-import jpdftweak.gui.TableComponent;
+
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+import com.lowagie.text.DocumentException;
 
 public class PageSizeTab extends Tab {
 

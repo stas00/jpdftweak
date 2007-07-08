@@ -11,7 +11,6 @@ import jpdftweak.core.PdfTweak;
 
 import com.lowagie.text.DocumentException;
 
-
 public class WatermarkOptions implements CommandOption {
 	
 	private String background = null;
