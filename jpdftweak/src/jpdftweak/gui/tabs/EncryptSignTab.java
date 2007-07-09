@@ -66,6 +66,12 @@ public class EncryptSignTab extends Tab {
 		for (int i=0; i<8 ; i++) {
 			p.add(permissionBoxes[i] = new JCheckBox(PdfTweak.permissionTexts[i]), cc.xy(1 + (i % 4), 1 + (i / 4)));
 		}
+		encryptMode.setSelectedIndex(1);
+		encryptMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateEncryptionControls();
+			}
+		});
 		p.setBorder(new TitledBorder("Permissions"));
 		updateEncryptionControls();
 		this.add(new JSeparator(), cc.xyw(1,7,3));
@@ -109,7 +115,9 @@ public class EncryptSignTab extends Tab {
 		ownerPassword.setEnabled(b);
 		noEncryptMetadata.setEnabled(b);
 		for(int i=0; i<permissionBoxes.length; i++) {
-			permissionBoxes[i].setEnabled(b);
+			boolean supported = (i<4||encryptMode.getSelectedIndex() != 0);
+			permissionBoxes[i].setEnabled(b && supported);
+			if (!supported) permissionBoxes[i].setSelected(false);
 		}
 	}
 	
