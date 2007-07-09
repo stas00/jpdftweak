@@ -99,6 +99,11 @@ public class PdfInputFile {
 	}
 
 	public int getPermissions() {
+		if (rdr.getCryptoMode() == 0) {
+			// 40-bit encryption does not support some flags, but sets them.
+			// Clear them so that they do not show up in -info output.
+			return rdr.getPermissions() & 0xFFFF00FF;
+		}
 		return rdr.getPermissions();
 	}
 
