@@ -26,12 +26,11 @@ public class OutputTab extends Tab {
 	private final MainForm mainForm;
 
 	public OutputTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		this.mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		this.add(new JLabel("Filename:"), cc.xy(1,1));
 		this.add(outputFile = new JTextField(""), cc.xy(2, 1));
-		outputFile.setEditable(false);
 		JButton selectFile;
 		this.add(selectFile = new JButton("..."), cc.xy(3, 1));
 		selectFile.addActionListener(new ActionListener() {
@@ -60,6 +59,12 @@ public class OutputTab extends Tab {
 						" PdfTk page marks");
 			}
 		});
+		this.add(new JLabel("<html>You can use the following variables in the output filename:<br>" +
+				"<tt>&lt;F></tt>: Input filename without extension<br>"+
+				"<tt>&lt;FX></tt>: Input filename with extension<br>" +
+				"<tt>&lt;P></tt>: Input file path without filename<br>" +
+				"<tt>&lt;#></tt>: Next free number (where file does not exist)<br>" +
+				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,5,3));
 	}
 
 	@Override

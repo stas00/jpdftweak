@@ -100,13 +100,24 @@ public class PdfTweak {
 	private Certificate[] certChain = null;
 	private int certificationLevel = 0;
 	private boolean sigVisible=false;
+	private final String inputFilePath, inputFileName, inputFileFullName;
 	
 
 	public PdfTweak(PdfInputFile singleFile) {
 		currentReader = singleFile.getReader();
+		File f = singleFile.getFile();
+		inputFilePath = f.getParentFile().getAbsolutePath();
+		inputFileFullName = f.getName();
+		int pos = inputFileFullName.lastIndexOf('.');
+		if (pos == -1) {
+			inputFileName = inputFileFullName;
+		} else {
+			inputFileName = inputFileFullName.substring(0, pos);
+		}
 	}
 	
 	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges) throws IOException, DocumentException {
+		this(firstFile);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfReader firstReader = firstFile.getReader();
 		Document document = new Document(firstReader.getPageSizeWithRotation(1));
@@ -170,6 +181,18 @@ public class PdfTweak {
 	}
 
 	public void writeOutput(String outputFile, boolean burst, boolean uncompressed) throws IOException, DocumentException {
+		outputFile = outputFile.replace("<F>", inputFileName);
+		outputFile = outputFile.replace("<FX>", inputFileFullName);
+		outputFile = outputFile.replace("<P>", inputFilePath);
+		if (outputFile.contains("<#>")) {
+			for (int i = 1;; i++) {
+				String f = outputFile.replace("<#>", "" + i);
+				if (!new File(f).exists()) {
+					outputFile = f;
+					break;
+				}
+			}
+		}
 		cargoCult();
 		try {
 			if (uncompressed) {
