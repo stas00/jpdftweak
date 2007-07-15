@@ -31,12 +31,13 @@ import com.lowagie.text.DocumentException;
 public class InputTab extends Tab {
 
 	private JTextField filename;
-	private JCheckBox multiFiles;
+	private JCheckBox multiFiles, batchProcessing;
 	private TableComponent fileCombination;
 	private JButton selectfile;
 	private List<PdfInputFile> inputFiles = new ArrayList<PdfInputFile>();
 	private JComboBox filesCombo;
 	private final MainForm mf;
+	private int batchTaskSelection = -1;
 
 	public InputTab(MainForm mf) {
 		super(new FormLayout("f:p, f:p:g, f:p, f:p", "f:p, f:p, f:p:g"));
@@ -60,22 +61,32 @@ public class InputTab extends Tab {
 				InputTab.this.mf.setInputFile(null);
 				fileCombination.clear();
 				selectfile.setEnabled(true);
-				multiFiles.setEnabled(true);
+				multiFiles.setEnabled(!batchProcessing.isSelected());
+				batchProcessing.setEnabled(!multiFiles.isSelected());
 				updateFileName();
 			}
 		});
-		this.add(multiFiles= new JCheckBox("Multiple file input / Select pages"), cc.xyw(1, 2, 4));
-		multiFiles.addActionListener(new ActionListener() {
+		this.add(multiFiles= new JCheckBox("Multiple file input / Select pages"), cc.xyw(1, 2, 2));
+		ActionListener l = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (multiFiles.isSelected()) {
+					batchProcessing.setEnabled(false);
 					selectfile.setEnabled(true);
 					fileCombination.setEnabled(true);
+				} else if (batchProcessing.isSelected()) {
+					multiFiles.setEnabled(false);
+					selectfile.setEnabled(true);
 				} else {
+					batchProcessing.setEnabled(true);
+					multiFiles.setEnabled(true);
 					selectfile.setEnabled(inputFiles.size() == 0);
 					fileCombination.setEnabled(false);
 				}
 			}
-		});
+		};
+		multiFiles.addActionListener(l);
+		this.add(batchProcessing = new JCheckBox("Batch processing"), cc.xyw(3,2,2));
+		batchProcessing.addActionListener(l);
 		filesCombo = new JComboBox();
 		this.add(fileCombination = new TableComponent(new String[] {"File", "From Page", "To Page", "Include Odd", "Include Even"}, new Class[] {PdfInputFile.class, Integer.class, Integer.class, Boolean.class, Boolean.class}, new Object[] {null, 1, -1, true, true}), cc.xyw(1, 3, 4));
 		fileCombination.setEnabled(false);
@@ -121,11 +132,15 @@ public class InputTab extends Tab {
 		if (inputFiles.size() == 1) mf.setInputFile(f);
 		filesCombo.addItem(f);
 		fileCombination.addRow(f, 1, f.getPageCount(), true, true);
-		if (!multiFiles.isSelected() && inputFiles.size() > 0)
+		if (!multiFiles.isSelected() && !batchProcessing.isSelected() && inputFiles.size() > 0)
 			selectfile.setEnabled(false);
 		if (inputFiles.size()>1) {
-			multiFiles.setSelected(true);
-			multiFiles.setEnabled(false);
+			if (batchProcessing.isSelected()) {
+				batchProcessing.setEnabled(false);
+			} else {
+				multiFiles.setSelected(true);
+				multiFiles.setEnabled(false);
+			}
 		}
 		updateFileName();
 	}
@@ -143,7 +158,10 @@ public class InputTab extends Tab {
 
 	@Override
 	public PdfTweak run(PdfTweak tweak) throws DocumentException, IOException {
-		if (multiFiles.isSelected()) {
+		if (batchProcessing.isSelected()) {
+			inputFiles.get(batchTaskSelection).reopen();
+			return new PdfTweak(inputFiles.get(batchTaskSelection));
+		} else if (multiFiles.isSelected()) {
 			for (PdfInputFile f : inputFiles) {
 				f.reopen();
 			}
@@ -186,4 +204,15 @@ public class InputTab extends Tab {
 		}
 	}
 
+	public int getBatchLength() {
+		if (batchProcessing.isSelected()) {
+			return inputFiles.size();
+		} else {
+			return 1;
+		}
+	}
+	
+	public void selectBatchTask(int batchTaskSelection) {
+		this.batchTaskSelection = batchTaskSelection;
+	}
 }

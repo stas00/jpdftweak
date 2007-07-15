@@ -95,9 +95,12 @@ public class MainForm extends JFrame {
 			for(Tab tab : tabs) {
 				tab.checkRun();
 			}
-			PdfTweak tweak = null;
-			for(Tab tab: tabs) {
-				tweak = tab.run(tweak);
+			for(int task = 0; task < inputTab.getBatchLength(); task++) {
+				inputTab.selectBatchTask(task);
+				PdfTweak tweak = null;
+				for(Tab tab: tabs) {
+					tweak = tab.run(tweak);
+				}
 			}
 			JOptionPane.showMessageDialog(this, "Finished", "JPDFTweak", JOptionPane.INFORMATION_MESSAGE);
 		} catch (DocumentException ex) {
