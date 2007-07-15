@@ -29,13 +29,11 @@ public class ShuffleRule {
 		"-4:!-4N1+0%+0%,!+1N1+0%+0%,!+2N1+0%+0%,!-3N1+0%+0%=Booklet Reorder",
 		"-4:!-4L0.707+0%-100%,+1L.707+100%-100%,!+2L0.707+0%-100%,-3L.707+100%-100%=Booklet Portrait",
 		"-4:!-4L0.707+0%-100%,+1L.707+0%-200%,!+2L0.707+0%-100%,-3L.707+0%-200%=Booklet Landscape",
-		/* // TODO define all these!
-		"=Booklet 2-Up Fold",
-		"=Booklet 2-Up Cut",
-		"=PocketMod",
-		"=PocketMod UpsideDown",
-		*/
-		"1:!+1N0.25+150.0%+300.0%,+1L0.25+250.0%-100.0%,+1U0.25-250.0%-100.0%,+1R0.25-350.0%+183.0%=Star Test Pattern",
+		"4:!-4N0.5+0%+100%,+1N0.5+100%+100%,+2U0.5-200%-100%,-3U0.5-100%-100%=Booklet 2-Up Fold",
+		"-8:!-8N0.5+0%+100%,+1N0.5+100%+100%,-6N0.5+0%+0%,+3N0.5+100%+0%,!+2N0.5+0%+100%,-7N0.5+100%+100%,+4N0.5+0%+0%,-5N0.5+100%+0%=Booklet 2-Up Cut",
+		"8:!+1L0.353+300%-100%,+2R0.353-400%+100%,+3R0.353-300%+100%,+4R0.353-200%+100%,+5R0.353-100%+100%,+6L0.353+0%-100%,+7L0.353+100%-100%,+8L0.353+200%-100%=PocketMod",
+		"8:!+1L0.353+300%-200%,+2R0.353-400%+0%,+3R0.353-300%+0%,+4R0.353-200%+0%,+5R0.353-100%+0%,+6L0.353+0%-200%,+7L0.353+100%-200%,+8L0.353+200%-200%=PocketMod UpsideDown",
+		"1:!+1N0.25+150%+300%,+1L0.25+250%-100%,+1U0.25-250%-100%,+1R0.25-350%+183%=Star Test Pattern",
 	};
 	
 	public ShuffleRule(boolean newPageBefore, PageBase pageBase, int pageNumber, char rotate, double scale, double offsetX, boolean offsetXPercent, double offsetY, boolean offsetYPercent, double frameWidth) {
