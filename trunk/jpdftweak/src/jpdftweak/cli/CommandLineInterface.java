@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import com.lowagie.text.DocumentException;
 
+import jpdftweak.Main;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfPageRange;
 import jpdftweak.core.PdfTweak;
@@ -50,6 +51,9 @@ public class CommandLineInterface {
 				} else {
 					showHelpFor(args[i+1]);
 				}
+				return;
+			} else if (args[i].equals("-v") || args[i].equals("-version")) {
+				System.out.println("JPDF Tweak " + Main.VERSION);
 				return;
 			} else if (args[i].startsWith("-")) {
 				if (i == args.length-1) {
@@ -151,7 +155,7 @@ public class CommandLineInterface {
 	}
 
 	private void showHelp() {
-		System.out.println("\n"+
+		System.out.println("jPDF Tweak "+Main.VERSION+"\n\n"+
 				"Usage: jpdftweak {inputfile} [-o[opt]] {outputfile}\n"+
 				"       jpdftweak -i[opt] {inputfile} [...] [-o[opt]] {outputfile}\n"+
 				"       jpdftweak -o[opt] {outputfile} [-i[opt]] {inputfile} [...]\n"+
@@ -164,12 +168,13 @@ public class CommandLineInterface {
 				"Parameters are case sensitive.\n\n"+
 				"Parameters\n"+
 				"~~~~~~~~~~\n"+
-				" -help                    Show this help.\n"+
-				" -help {transformation}   Show help for a transformation\n"+
-				" -password {password}     Use password for opening next input file\n"+
-				" -i[options]              next parameter is input file, see '-help -i'\n"+
-				" -i=ALIAS                 use ALIAS for next input file name, '-help -i'\n"+
-				" -o[options]              next parameter is output file, see '-help -o'\n"+
+				" -help                   Show this help.\n"+
+				" -help {transformation}  Show help for a transformation\n"+
+				" -v[ersion]              Show version\n"+
+				" -password {password}    Use password for opening next input file\n"+
+				" -i[{options}]           next parameter is input file, see '-help -i'\n"+
+				" -i={ALIAS}              use ALIAS for next input file name, '-help -i'\n"+
+				" -o[{options}]           next parameter is output file, see '-help -o'\n"+
 				"\n"+
 				"Transformations\n"+
 				"~~~~~~~~~~~~~~~");
@@ -195,7 +200,7 @@ public class CommandLineInterface {
 					"You can load the file to an alias name using -i=ALIAS and use that alias name\n" +
 					"later; this is useful if you want to reference a file more than once and it has\n" +
 					"a long path/filename, or it requires a password. If you know 'pdftk', you know\n" +
-					"aliases as well, only that they are optional in jpdftweak and not limited to a\n"+
+					"aliases as well, only that they are optional in jPDF Tweak and not limited to a\n"+
 					"single character.\n\n" +
 					"Example:\n"+
 					"  jpdftweak -o mixedmode.pdf -password secret -i=A secret.pdf \\\n"+

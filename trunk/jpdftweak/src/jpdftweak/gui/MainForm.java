@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileFilter;
 
+import jpdftweak.Main;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.tabs.AttachmentTab;
@@ -51,7 +52,7 @@ public class MainForm extends JFrame {
 	private JFileChooser pdfChooser = new JFileChooser();
 	
 	public MainForm() {
-		super("jPDF Tweak 0.1");
+		super("jPDF Tweak "+Main.VERSION);
 		pdfChooser.setFileFilter(new FileFilter() {
 			@Override
 			public String getDescription() {
