@@ -54,6 +54,7 @@
 				<include name="com/lowagie/text/pdf/fonts/*"/>
 				<exclude name="com/lowagie/tools/**"/>
 				<exclude name="org/bouncycastle/mail/**"/>
+				<exclude name="org/bouncycastle/util/IPTest.class"/>
 			</patternset>
 		</unjar>		
 		<zip destfile="build/libs.jar" basedir="build/libs"/>
