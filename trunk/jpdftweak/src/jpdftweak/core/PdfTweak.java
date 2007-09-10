@@ -60,25 +60,25 @@ public class PdfTweak {
 		"Printing", "ModifyContents", "Copy", "ModifyAnnotations", 
 		"FillIn", "ScreenReaders", "Assembly", "HQPrinting"
 	};
-	
+
 	public static final String[] TRANSITION_NAMES = new String[] {
-			"None",
-			"Out Vertical Split",
-			"Out Horizontal Split",
-			"In Vertical Split",
-			"In Horizontal Split",
-			"Vertical Blinds",
-			"Vertical Blinds",
-			"Inward Box",
-			"Outward Box",
-			"Left-Right Wipe",
-			"Right-Left Wipe",
-			"Bottom-Top Wipe",
-			"Top-Bottom Wipe",
-			"Dissolve",
-			"Left-Right Glitter",
-			"Top-Bottom Glitter",
-			"Diagonal Glitter",				
+		"None",
+		"Out Vertical Split",
+		"Out Horizontal Split",
+		"In Vertical Split",
+		"In Horizontal Split",
+		"Vertical Blinds",
+		"Vertical Blinds",
+		"Inward Box",
+		"Outward Box",
+		"Left-Right Wipe",
+		"Right-Left Wipe",
+		"Bottom-Top Wipe",
+		"Top-Bottom Wipe",
+		"Dissolve",
+		"Left-Right Glitter",
+		"Top-Bottom Glitter",
+		"Diagonal Glitter",
 	};
 
 	public static String[] getKnownInfoNames() {
@@ -88,7 +88,7 @@ public class PdfTweak {
 		}
 		return result;
 	}
-	
+
 	private static final String PDFTK_PAGE_MARKER= "pdftk_PageNum";
 
 	private PdfReader currentReader;
@@ -105,7 +105,6 @@ public class PdfTweak {
 	private boolean sigVisible=false;
 	private final String inputFilePath, inputFileName, inputFileFullName;
 	private boolean preserveHyperlinks;
-	
 
 	public PdfTweak(PdfInputFile singleFile) {
 		currentReader = singleFile.getReader();
@@ -119,7 +118,7 @@ public class PdfTweak {
 			inputFileName = inputFileFullName.substring(0, pos);
 		}
 	}
-	
+
 	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges) throws IOException, DocumentException {
 		this(firstFile);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -282,7 +281,7 @@ public class PdfTweak {
 			dic.put(PdfName.ROTATE, new PdfNumber(rotation));
 		}
 	}
-	
+
 	public void removeRotation() throws DocumentException, IOException {
 		boolean needed=false;
 		for (int i = 1; i <= currentReader.getNumberOfPages(); i++) {
@@ -350,7 +349,7 @@ public class PdfTweak {
 		document.close();
 		currentReader = new PdfReader(baos.toByteArray());	
 	}
-	
+
 	public void scalePages(float newWidth, float newHeight, boolean noEnlarge, boolean preserveAspectRatio) throws DocumentException, IOException {
 		removeRotation();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -409,7 +408,7 @@ public class PdfTweak {
 		document.close();
 		currentReader = new PdfReader(baos.toByteArray());
 	}
-	
+
 	public void shufflePages(int passLength, ShuffleRule[] shuffleRules) throws DocumentException, IOException {
 		removeRotation();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -565,33 +564,33 @@ public class PdfTweak {
 
 	public void updateBookmarks(PdfBookmark[] bm) throws DocumentException, IOException{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PdfStamper stamper = new PdfStamper(currentReader, baos);
-        stamper.setOutlines(PdfBookmark.makeBookmarks(bm));
-        stamper.close();
+		PdfStamper stamper = new PdfStamper(currentReader, baos);
+		stamper.setOutlines(PdfBookmark.makeBookmarks(bm));
+		stamper.close();
 		currentReader = new PdfReader(baos.toByteArray());	
 	}
 
 	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, int pnPosition, int pnSize, float pnHOff, float pnVOff) throws DocumentException, IOException {
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();  
 		int pagecount = currentReader.getNumberOfPages();
-	      PdfGState gs1 = new PdfGState();
-	      gs1.setFillOpacity(wmOpacity);
-	      PdfStamper stamper = new PdfStamper(currentReader, baos);
-	      BaseFont bf = BaseFont.createFont("Helvetica", BaseFont.WINANSI,
-                  false);
-	      float txtwidth=0;
-	      PdfImportedPage wmTemplate = null;
-	      if (wmText != null) {
-		      txtwidth = bf.getWidthPoint(wmText, wmSize);
-	      }
-	      if (wmFile != null) {
-	    	  wmTemplate = stamper.getImportedPage(wmFile.getReader(), 1);
-	      }
-	      for (int i = 1; i <= pagecount; i++) {
-	    	  if (wmTemplate != null) {
-	    		  PdfContentByte underContent = stamper.getUnderContent(i);
-	    		  underContent.addTemplate(wmTemplate, 0, 0);
-	  			  if (preserveHyperlinks) {
+		PdfGState gs1 = new PdfGState();
+		gs1.setFillOpacity(wmOpacity);
+		PdfStamper stamper = new PdfStamper(currentReader, baos);
+		BaseFont bf = BaseFont.createFont("Helvetica", BaseFont.WINANSI,
+				false);
+		float txtwidth=0;
+		PdfImportedPage wmTemplate = null;
+		if (wmText != null) {
+			txtwidth = bf.getWidthPoint(wmText, wmSize);
+		}
+		if (wmFile != null) {
+			wmTemplate = stamper.getImportedPage(wmFile.getReader(), 1);
+		}
+		for (int i = 1; i <= pagecount; i++) {
+			if (wmTemplate != null) {
+				PdfContentByte underContent = stamper.getUnderContent(i);
+				underContent.addTemplate(wmTemplate, 0, 0);
+				if (preserveHyperlinks) {
 					List links = currentReader.getLinks(i);
 					PdfWriter w = underContent.getPdfWriter();
 					for (int j = 0; j < links.size(); j++) {
@@ -600,49 +599,49 @@ public class PdfTweak {
 							continue; // preserving internal links would be pointless here
 						w.addAnnotation(link.createAnnotation(w));
 					}
-				  }
-	    	  }
-	    	  PdfContentByte overContent = stamper.getOverContent(i);
-    		  Rectangle size = currentReader.getPageSizeWithRotation(i);
-	    	  if (wmText != null) {
-	    		  float angle = (float) Math.atan(size.getHeight() / size.getWidth());
-	    		  float m1 = (float) Math.cos(angle);
-	    		  float m2 = (float) - Math.sin(angle);
-	    		  float m3 = (float) Math.sin(angle);
-	    		  float m4 = (float) Math.cos(angle);
-	    		  float xoff = (float) ( -Math.cos(angle) * txtwidth / 2 - Math
-	    				  .sin(angle)
-	    				  * wmSize / 2);
-	    		  float yoff = (float) (Math.sin(angle) * txtwidth / 2 - Math
-	    				  .cos(angle)
-	    				  * wmSize / 2);
-	    		  overContent.saveState();
-	    		  overContent.setGState(gs1);
-	    		  overContent.beginText();
-	    		  overContent.setFontAndSize(bf, wmSize);
-	    		  overContent.setTextMatrix(m1, m2, m3, m4, xoff + size.getWidth() / 2,
-	    				  yoff + size.getHeight() / 2);
-	    		  overContent.showText(wmText);
-	    		  overContent.endText();
-	    		  overContent.restoreState();
-	    	  }
-	    	  if (pnPosition != -1) {
-	    		  overContent.beginText();
-	    		  overContent.setFontAndSize(bf, pnSize);
-	    		  float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.getWidth() * (pnPosition % 3) / 2.0f;
-	    		  float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.getHeight() * (pnPosition / 3) / 2.0f;
-	    		  overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, ""+i, xx, yy, 0);
-	    		  overContent.endText();
-	    	  }
-	      }
-	      stamper.close();
-	      currentReader = new PdfReader(baos.toByteArray());
+				}
+			}
+			PdfContentByte overContent = stamper.getOverContent(i);
+			Rectangle size = currentReader.getPageSizeWithRotation(i);
+			if (wmText != null) {
+				float angle = (float) Math.atan(size.getHeight() / size.getWidth());
+				float m1 = (float) Math.cos(angle);
+				float m2 = (float) - Math.sin(angle);
+				float m3 = (float) Math.sin(angle);
+				float m4 = (float) Math.cos(angle);
+				float xoff = (float) ( -Math.cos(angle) * txtwidth / 2 - Math
+						.sin(angle)
+						* wmSize / 2);
+				float yoff = (float) (Math.sin(angle) * txtwidth / 2 - Math
+						.cos(angle)
+						* wmSize / 2);
+				overContent.saveState();
+				overContent.setGState(gs1);
+				overContent.beginText();
+				overContent.setFontAndSize(bf, wmSize);
+				overContent.setTextMatrix(m1, m2, m3, m4, xoff + size.getWidth() / 2,
+						yoff + size.getHeight() / 2);
+				overContent.showText(wmText);
+				overContent.endText();
+				overContent.restoreState();
+			}
+			if (pnPosition != -1) {
+				overContent.beginText();
+				overContent.setFontAndSize(bf, pnSize);
+				float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.getWidth() * (pnPosition % 3) / 2.0f;
+				float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.getHeight() * (pnPosition / 3) / 2.0f;
+				overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, ""+i, xx, yy, 0);
+				overContent.endText();
+			}
+		}
+		stamper.close();
+		currentReader = new PdfReader(baos.toByteArray());
 	}
 
 	public int getPageCount() {
 		return currentReader.getNumberOfPages();
 	}
-	
+
 	public void setTransition(int page, int type, int tduration, int pduration) {
 		if (transitionValues == null) {
 			transitionValues = new int[getPageCount()][3];
@@ -654,7 +653,7 @@ public class PdfTweak {
 		transitionValues[page-1][1] = tduration;
 		transitionValues[page-1][2] = pduration;
 	}
-	
+
 	public void setViewerPreferences(int simplePrefs, Map<PdfName, PdfObject> optionalPrefs) {
 		this.optionalViewerPreferences = optionalPrefs;
 		this.simpleViewerPreferences = simplePrefs;
@@ -693,7 +692,6 @@ public class PdfTweak {
 		for(int i=0; i<currentReader.getNumberOfPages(); i++) {
 			page = copy.getImportedPage(currentReader, i+1);
 			copy.addPage(page);
-			
 		}
 		PRAcroForm form = currentReader.getAcroForm();
 		if (form != null) {
