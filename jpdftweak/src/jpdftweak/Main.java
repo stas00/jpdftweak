@@ -6,7 +6,7 @@ import jpdftweak.cli.CommandLineInterface;
 import jpdftweak.gui.MainForm;
 
 public class Main {
-	public static final String VERSION = "0.1.5.SVN";
+	public static final String VERSION = "0.9";
 
 	public static void main(String[] args) {
 		if (args.length == 0) {
