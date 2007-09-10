@@ -20,10 +20,12 @@ import jpdftweak.core.PdfTweak;
 public class CommandLineInterface {
 
 	private CommandOption[] options = {
+			new PreserveHyperlinksOption(),
 			new RotateOption(),
 			new ScaleOption(),
 			new WatermarkOptions(),
 			new ShuffleOption(),
+			new PageNumberOption(),
 			new BookmarksOption(),
 			new AttachOption(),
 			new TransitionOption(),

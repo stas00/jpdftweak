@@ -13,6 +13,8 @@ import jpdftweak.core.PdfTweak;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfPageLabels;
+import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 
 public class InfoOption implements CommandOption {
 
@@ -54,6 +56,16 @@ public class InfoOption implements CommandOption {
 			w.write("    USERPW "+file.getUserPassword());w.newLine();
 			for (Map.Entry<String,String> entry : file.getInfoDictionary().entrySet()) {
 				w.write("DOCINFO "+entry.getKey()+"="+entry.getValue());w.newLine();
+			}
+			PdfPageLabelFormat[] formats = file.getPageLabels();
+			if (formats != null) {
+				for (PdfPageLabelFormat format : formats) {
+					w.write("PAGELABELS " + format.physicalPage+"="+
+							(format.prefix=="" ? "" : (format.prefix+":"))+
+							format.logicalPage+
+							(format.numberStyle == PdfPageLabels.DECIMAL_ARABIC_NUMERALS ? "" : ("xIiAa-".charAt(format.numberStyle))));
+					w.newLine();
+				}
 			}
 			if (more){
 				for (PdfBookmark b : file.getBookmarks(1)) {
