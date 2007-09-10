@@ -22,11 +22,11 @@ public class PageSizeTab extends Tab {
 
 	private JTextField scaleWidth, scaleHeight;
 	private JCheckBox rotatePages, fixRotation,
-		scalePages, scaleNoPreserve, scaleCenter;
+		scalePages, scaleNoPreserve, scaleCenter, preserveHyperlinks;
 	private JComboBox rotatePortrait, rotateLandscape, scaleSize;
 
 	public PageSizeTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, 10dlu, f:p, 10dlu, f:p,f:p, f:p,f:p, f:p,f:p,f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, 10dlu, f:p, 10dlu, f:p,f:p, f:p,f:p, f:p,f:p, 10dlu, f:p, f:p:g"));
 		CellConstraints cc = new CellConstraints();
 		this.add(rotatePages = new JCheckBox("Rotate pages"), cc.xyw(1, 1, 3));
 		this.add(new JLabel("Portrait pages:"), cc.xy(1, 2));
@@ -83,6 +83,8 @@ public class PageSizeTab extends Tab {
 		scaleHeight.setEnabled(false);
 		scaleCenter.setEnabled(false);
 		scaleNoPreserve.setEnabled(false);
+		this.add(new JSeparator(), cc.xyw(1, 13, 3));
+		this.add(preserveHyperlinks = new JCheckBox("Preserve hyperlinks (EXPERIMENTAL)"), cc.xyw(1,14,3));	
 	}
 	
 	protected void updateScaleSize() {
@@ -97,6 +99,9 @@ public class PageSizeTab extends Tab {
 
 	@Override
 	public PdfTweak run(PdfTweak tweak) throws IOException, DocumentException {
+		if (preserveHyperlinks.isSelected()) {
+			tweak.preserveHyperlinks();
+		}
 		if (rotatePages.isSelected()) {
 			tweak.rotatePages(rotatePortrait.getSelectedIndex(), rotateLandscape.getSelectedIndex());
 		}

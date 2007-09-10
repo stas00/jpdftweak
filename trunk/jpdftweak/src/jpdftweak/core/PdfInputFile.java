@@ -11,10 +11,12 @@ import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfPageLabels;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.SimpleBookmark;
+import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 
 public class PdfInputFile {
 	private final File file;
@@ -120,5 +122,9 @@ public class PdfInputFile {
 	public List<PdfBookmark> getBookmarks(int initialDepth) {
 		List bmk = SimpleBookmark.getBookmark(rdr);
 		return PdfBookmark.parseBookmarks(bmk, initialDepth);
+	}
+
+	public PdfPageLabelFormat[] getPageLabels() {
+		return PdfPageLabels.getPageLabelFormats(rdr);
 	}
 }

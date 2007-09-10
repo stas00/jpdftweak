@@ -26,7 +26,7 @@ public class TableComponent extends JPanel {
 		setLayout(new FormLayout("f:p:g,f:p:g,f:p:g,f:p:g", "f:p:g, f:p"));
 		CellConstraints cc = new CellConstraints();
 		add(jsp = new JScrollPane(jt = new JTable(tcm = new TableComponentModel(captions, classes))), cc.xyw(1, 1, 4));
-		jsp.setPreferredSize(new Dimension(700, 400));
+		jsp.setPreferredSize(new Dimension(750, 400));
 		add(add = new JButton("Add"), cc.xy(1, 2));
 		add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
