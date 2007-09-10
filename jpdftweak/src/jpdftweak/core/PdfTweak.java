@@ -109,7 +109,7 @@ public class PdfTweak {
 	public PdfTweak(PdfInputFile singleFile) {
 		currentReader = singleFile.getReader();
 		File f = singleFile.getFile();
-		inputFilePath = f.getParentFile().getAbsolutePath();
+		inputFilePath = f.getAbsoluteFile().getParentFile().getAbsolutePath();
 		inputFileFullName = f.getName();
 		int pos = inputFileFullName.lastIndexOf('.');
 		if (pos == -1) {
