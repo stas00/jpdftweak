@@ -21,6 +21,7 @@ import com.lowagie.text.DocumentException;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PRAcroForm;
+import com.lowagie.text.pdf.PdfAnnotation;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfCopy;
 import com.lowagie.text.pdf.PdfDictionary;
@@ -29,6 +30,7 @@ import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfNumber;
 import com.lowagie.text.pdf.PdfObject;
+import com.lowagie.text.pdf.PdfPageLabels;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
@@ -36,6 +38,7 @@ import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfTransition;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 import com.lowagie.text.pdf.interfaces.PdfEncryptionSettings;
 
 public class PdfTweak {
@@ -101,6 +104,7 @@ public class PdfTweak {
 	private int certificationLevel = 0;
 	private boolean sigVisible=false;
 	private final String inputFilePath, inputFileName, inputFileFullName;
+	private boolean preserveHyperlinks;
 	
 
 	public PdfTweak(PdfInputFile singleFile) {
@@ -302,16 +306,45 @@ public class PdfTweak {
 			}
 			int rotation = currentReader.getPageRotation(i);
 			page = writer.getImportedPage(currentReader, i);
+			float a, b, c, d, e, f;
 			if (rotation == 0) {
-				cb.addTemplate(page, 1, 0, 0, 1, 0, 0);
+				a=1; b=0; c=0; d=1; e=0; f=0;
 			} else if (rotation == 90) {
-				cb.addTemplate(page, 0, -1, 1, 0, 0, currentSize.getHeight());
+				a=0; b=-1; c=1; d=0; e=0; f=currentSize.getHeight();
 			} else if (rotation == 180) {
-				cb.addTemplate(page, -1, 0, 0, -1, currentSize.getWidth(), currentSize.getHeight());
+				a=-1; b=0; c=0; d=-1; e=currentSize.getWidth(); f=currentSize.getHeight();
 			} else if (rotation == 270) {
-				cb.addTemplate(page, 0, 1, -1, 0, currentSize.getWidth(), 0);
+				a=0; b=1; c=-1; d=0; e=currentSize.getWidth(); f=0;
 			} else {
 				throw new IOException("Unparsable rotation value: "+rotation);
+			}
+			cb.addTemplate(page, a, b, c, d, e, f);
+			if (preserveHyperlinks) {
+				List links = currentReader.getLinks(i);
+				for (int j = 0; j < links.size(); j++) {
+					PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
+					if (link.isInternal()) {
+						int dPage = link.getDestinationPage();
+						int dRotation = currentReader.getPageRotation(dPage);
+						Rectangle dSize = currentReader.getPageSizeWithRotation(dPage);
+						float aa, bb, cc, dd, ee, ff;
+						if (dRotation == 0) {
+							aa=1; bb=0; cc=0; dd=1; ee=0; ff=0;
+						} else if (dRotation == 90) {
+							aa=0; bb=-1; cc=1; dd=0; ee=0; ff=dSize.getHeight();
+						} else if (dRotation == 180) {
+							aa=-1; bb=0; cc=0; dd=-1; ee=dSize.getWidth(); ff=dSize.getHeight();
+						} else if (dRotation == 270) {
+							aa=0; bb=1; cc=-1; dd=0; ee=dSize.getWidth(); ff=0;
+						} else {
+							throw new IOException("Unparsable rotation value: "+dRotation);
+						}
+						link.setDestinationPage(dPage);
+						link.transformDestination(aa, bb, cc, dd, ee, ff);
+					}
+					link.transformRect(a, b, c, d, e, f);
+					writer.addAnnotation(link.createAnnotation(writer));
+				}
 			}
 		}
 		document.close();
@@ -346,6 +379,32 @@ public class PdfTweak {
 			offsetY = (newSize.getHeight() - (currentSize.getHeight() * factorY)) / 2f;
 			page = writer.getImportedPage(currentReader, i);
 			cb.addTemplate(page, factorX, 0, 0, factorY, offsetX, offsetY);
+			if (preserveHyperlinks) {
+				List links = currentReader.getLinks(i);
+				for (int j = 0; j < links.size(); j++) {
+					PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
+					if (link.isInternal()) {
+						int dPage = link.getDestinationPage();
+						Rectangle dSize = currentReader.getPageSizeWithRotation(dPage);
+						float dFactorX = newSize.getWidth() / dSize.getWidth();
+						float dFactorY = newSize.getHeight() / dSize.getHeight();
+						if (noEnlarge) {
+							if (dFactorX > 1) dFactorX=1;
+							if (dFactorY > 1) dFactorY=1;
+						}
+						if (preserveAspectRatio) {
+							dFactorX = Math.min(dFactorX, dFactorY);
+							dFactorY = dFactorX;
+						}
+						float dOffsetX = (newSize.getWidth() - (dSize.getWidth() * dFactorX)) / 2f;
+						float dOffsetY = (newSize.getHeight() - (dSize.getHeight() * dFactorY)) / 2f;
+						link.setDestinationPage(dPage);
+						link.transformDestination(dFactorX, 0, 0, dFactorY, dOffsetX, dOffsetY);
+					}
+					link.transformRect(factorX, 0, 0, factorY, offsetX, offsetY);
+					writer.addAnnotation(link.createAnnotation(writer));
+				}
+			}
 		}
 		document.close();
 		currentReader = new PdfReader(baos.toByteArray());
@@ -370,6 +429,36 @@ public class PdfTweak {
 		int pl = Math.abs(passLength);
 		int cnt = currentReader.getNumberOfPages();
 		int refcnt = ((cnt + (pl-1))/pl)*pl;
+		int[] destinationPageNumbers = null;
+		ShuffleRule[] destinationShuffleRules = null;
+		if (preserveHyperlinks){
+			destinationPageNumbers = new int[cnt+1];
+			destinationShuffleRules = new ShuffleRule[cnt+1];
+			int ddPage=0;
+			for (int i = 0; i < cnt; i+=pl) {
+				int idx = i;
+				int reverseIdx=refcnt - idx - pl;
+				if (passLength <0) {
+					idx = i/2;
+					reverseIdx = refcnt - idx-pl;
+				}
+				for (ShuffleRule sr : shuffleRules) {
+					if (sr.isNewPageBefore()) ddPage++;
+					int pg = sr.getPageNumber();
+					if (sr.getPageBase() == PageBase.BEGINNING) {
+						pg += idx;
+					} else if (sr.getPageBase() == PageBase.END) {
+						pg += reverseIdx;
+					}
+					if (pg < 1)
+						throw new IOException("Invalid page number. Check your n-up rules.");
+					if (pg <= cnt) {
+						destinationPageNumbers[pg] = ddPage;
+						destinationShuffleRules[pg] = sr;
+					}
+				}
+			}
+		}
 		for (int i = 0; i < cnt; i+=pl) {
 			int idx = i;
 			int reverseIdx=refcnt - idx - pl;;
@@ -408,6 +497,38 @@ public class PdfTweak {
 				if (pg <= cnt) {
 					page = writer.getImportedPage(currentReader, pg);
 					cb.addTemplate(page, a, b, c, d, e, f);
+					if (preserveHyperlinks) {
+						List links = currentReader.getLinks(pg);
+						for (int j = 0; j < links.size(); j++) {
+							PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
+							if (link.isInternal()) {
+								int dPage = link.getDestinationPage();
+								ShuffleRule dsr = destinationShuffleRules[dPage];								
+								float dS = (float)dsr.getScale();
+								float dOffsetx = (float)dsr.getOffsetX();
+								float dOffsety = (float)dsr.getOffsetY();
+								if (dsr.isOffsetXPercent()) { dOffsetx = dOffsetx * size.getWidth()/100;}
+								if (dsr.isOffsetXPercent()) { dOffsety = dOffsety * size.getHeight()/100;}
+								float aa, bb, cc, dd, ee, ff;
+								switch(dsr.getRotate()) {
+								case 'N': 
+									aa=dS; bb=0; cc=0; dd=dS; ee=dOffsetx*dS; ff=dOffsety*dS; break;
+								case 'R':
+									aa=0; bb=-dS; cc=dS; dd=0; ee=dOffsety*dS; ff=-dOffsetx*dS; break;
+								case 'U':
+									aa=-dS; bb=0; cc=0; dd=-dS; ee=-dOffsetx*dS; ff=-dOffsety*dS; break;
+								case 'L':
+									aa=0; bb=dS; cc=-dS; dd=0; ee=-dOffsety*dS; ff=dOffsetx*dS; break;	
+								default: 
+									throw new RuntimeException(""+sr.getRotate());
+								}
+								link.setDestinationPage(destinationPageNumbers[dPage]);
+								link.transformDestination(aa, bb, cc, dd, ee, ff);
+							}
+							link.transformRect(a, b, c, d, e, f);
+							writer.addAnnotation(link.createAnnotation(writer));
+						}
+					}
 					if (sr.getFrameWidth() > 0) {
 						cb.setLineWidth((float)sr.getFrameWidth());
 						cb.rectangle(e, f, a*size.getWidth()+c*size.getHeight(), b*size.getWidth()+d*size.getHeight());
@@ -470,6 +591,16 @@ public class PdfTweak {
 	    	  if (wmTemplate != null) {
 	    		  PdfContentByte underContent = stamper.getUnderContent(i);
 	    		  underContent.addTemplate(wmTemplate, 0, 0);
+	  			  if (preserveHyperlinks) {
+					List links = currentReader.getLinks(i);
+					PdfWriter w = underContent.getPdfWriter();
+					for (int j = 0; j < links.size(); j++) {
+						PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
+						if (link.isInternal()) 
+							continue; // preserving internal links would be pointless here
+						w.addAnnotation(link.createAnnotation(w));
+					}
+				  }
 	    	  }
 	    	  PdfContentByte overContent = stamper.getOverContent(i);
     		  Rectangle size = currentReader.getPageSizeWithRotation(i);
@@ -547,5 +678,33 @@ public class PdfTweak {
 			ioe.initCause(ex);
 			throw ioe;
 		}
+	}
+
+	public void setPageNumbers(PdfPageLabelFormat[] labelFormats) throws DocumentException, IOException {
+		PdfPageLabels lbls = new PdfPageLabels();
+		for (PdfPageLabelFormat format : labelFormats) {
+			lbls.addPageLabel(format);			
+		}
+		Document document = new Document(currentReader.getPageSizeWithRotation(1));
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PdfCopy copy = new PdfCopy(document, baos);
+		document.open();
+		PdfImportedPage page;
+		for(int i=0; i<currentReader.getNumberOfPages(); i++) {
+			page = copy.getImportedPage(currentReader, i+1);
+			copy.addPage(page);
+			
+		}
+		PRAcroForm form = currentReader.getAcroForm();
+		if (form != null) {
+			copy.copyAcroForm(currentReader);
+		}
+		copy.setPageLabels(lbls);
+		document.close();
+		currentReader = new PdfReader(baos.toByteArray());
+	}
+
+	public void preserveHyperlinks() {
+		preserveHyperlinks = true;
 	}
 }

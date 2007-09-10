@@ -22,6 +22,7 @@ import jpdftweak.gui.tabs.EncryptSignTab;
 import jpdftweak.gui.tabs.InputTab;
 import jpdftweak.gui.tabs.InteractionTab;
 import jpdftweak.gui.tabs.OutputTab;
+import jpdftweak.gui.tabs.PageNumberTab;
 import jpdftweak.gui.tabs.PageSizeTab;
 import jpdftweak.gui.tabs.ShuffleTab;
 import jpdftweak.gui.tabs.Tab;
@@ -40,6 +41,7 @@ public class MainForm extends JFrame {
 			new PageSizeTab(this),
 			new WatermarkTab(this),
 			new ShuffleTab(this),
+			new PageNumberTab(this),
 			new BookmarkTab(this),
 			new AttachmentTab(this),
 			new InteractionTab(this),
