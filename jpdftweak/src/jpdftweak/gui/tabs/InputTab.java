@@ -38,6 +38,7 @@ public class InputTab extends Tab {
 	private JComboBox filesCombo;
 	private final MainForm mf;
 	private int batchTaskSelection = -1;
+	private boolean useTempFiles = false;
 
 	public InputTab(MainForm mf) {
 		super(new FormLayout("f:p, f:p:g, f:p, f:p", "f:p, f:p, f:p:g"));
@@ -160,7 +161,7 @@ public class InputTab extends Tab {
 	public PdfTweak run(PdfTweak tweak) throws DocumentException, IOException {
 		if (batchProcessing.isSelected()) {
 			inputFiles.get(batchTaskSelection).reopen();
-			return new PdfTweak(inputFiles.get(batchTaskSelection));
+			return new PdfTweak(inputFiles.get(batchTaskSelection), useTempFiles);
 		} else if (multiFiles.isSelected()) {
 			for (PdfInputFile f : inputFiles) {
 				f.reopen();
@@ -176,10 +177,10 @@ public class InputTab extends Tab {
 				boolean even = (Boolean)row[4];
 				ranges.add(new PdfPageRange(ifile, from, to, odd, even));
 			}
-			 return new PdfTweak(inputFiles.get(0), ranges);
+			 return new PdfTweak(inputFiles.get(0), ranges, useTempFiles);
 		} else {
 			inputFiles.get(0).reopen();
-			return new PdfTweak(inputFiles.get(0));
+			return new PdfTweak(inputFiles.get(0), useTempFiles);
 		}
 	}
 
@@ -214,5 +215,9 @@ public class InputTab extends Tab {
 	
 	public void selectBatchTask(int batchTaskSelection) {
 		this.batchTaskSelection = batchTaskSelection;
+	}
+
+	public void setUseTempFiles(boolean useTempFiles) {
+		this.useTempFiles = useTempFiles;
 	}
 }

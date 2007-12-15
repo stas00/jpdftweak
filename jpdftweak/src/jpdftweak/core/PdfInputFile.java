@@ -15,6 +15,7 @@ import com.lowagie.text.pdf.PdfPageLabels;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.RandomAccessFileOrArray;
 import com.lowagie.text.pdf.SimpleBookmark;
 import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 
@@ -32,8 +33,8 @@ public class PdfInputFile {
 	}
 
 	private void open() throws IOException {
-		rdr = new PdfReader(file.getAbsolutePath(), ownerPassword
-				.getBytes("ISO-8859-1"));
+		RandomAccessFileOrArray raf = new RandomAccessFileOrArray(file.getAbsolutePath(), false, true);
+		rdr = new PdfReader(raf, ownerPassword.getBytes("ISO-8859-1"));
 		if (!rdr.isOpenedWithFullPermissions())
 			throw new IOException("Invalid owner password");
 		rdr.consolidateNamedDestinations();
