@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -105,8 +106,15 @@ public class PdfTweak {
 	private boolean sigVisible=false;
 	private final String inputFilePath, inputFileName, inputFileFullName;
 	private boolean preserveHyperlinks;
+	private File tempfile1 = null, tempfile2 = null;
 
-	public PdfTweak(PdfInputFile singleFile) {
+	public PdfTweak(PdfInputFile singleFile, boolean useTempFiles) throws IOException {
+		if (useTempFiles) {
+			tempfile1 = File.createTempFile("~jpdftweak", ".tmp").getAbsoluteFile();
+			tempfile2 = File.createTempFile("~jpdftweak", ".tmp").getAbsoluteFile();
+			tempfile1.deleteOnExit();
+			tempfile2.deleteOnExit();
+		}
 		currentReader = singleFile.getReader();
 		File f = singleFile.getFile();
 		inputFilePath = f.getAbsoluteFile().getParentFile().getAbsolutePath();
@@ -119,9 +127,9 @@ public class PdfTweak {
 		}
 	}
 
-	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges) throws IOException, DocumentException {
-		this(firstFile);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges, boolean useTempFiles) throws IOException, DocumentException {
+		this(firstFile, useTempFiles);
+		OutputStream baos = createTempOutputStream();
 		PdfReader firstReader = firstFile.getReader();
 		Document document = new Document(firstReader.getPageSizeWithRotation(1));
 		PdfCopy copy = new PdfCopy(document, baos);
@@ -139,9 +147,36 @@ public class PdfTweak {
 			copy.copyAcroForm(firstReader);
 		}
 		document.close();
-		currentReader = new PdfReader(baos.toByteArray());
+		currentReader = getTempPdfReader(baos);
+	}
+	
+	private OutputStream createTempOutputStream() throws IOException {
+		if (tempfile1 != null) {
+			File swap = tempfile1;
+			tempfile1 = tempfile2;
+			tempfile2 = swap;
+			if (!tempfile1.delete()) 
+				throw new IOException("Cannot delete "+tempfile1);
+			return new FileOutputStream(tempfile1);
+		} else {
+			return new ByteArrayOutputStream();
+		}
+	}
+	
+	private PdfReader getTempPdfReader(OutputStream out) throws IOException {
+		if (tempfile1 != null) {
+			return new PdfReader(tempfile1.getPath());
+		} else {
+			byte[] bytes = ((ByteArrayOutputStream)out).toByteArray();
+			return new PdfReader(bytes);
+		}
 	}
 
+	public void cleanup() {
+		if (tempfile1 != null) tempfile1.delete();
+		if (tempfile2 != null) tempfile2.delete();
+	}
+	
 	/** 
 	 * Some stuff that is unconditionally done by pdftk.
 	 * Maybe it helps.
@@ -264,6 +299,11 @@ public class PdfTweak {
 		}
 		currentReader.close();
 		currentReader = null;
+		if (tempfile1 != null && !tempfile1.delete()) 
+			throw new IOException("Cannot delete "+tempfile1);
+		if (tempfile2 != null && !tempfile2.delete()) 
+			throw new IOException("Cannot delete "+tempfile2);
+		tempfile1 = tempfile2 = null;
 	}
 
 	public void rotatePages(int portraitCount, int landscapeCount) {
@@ -288,7 +328,7 @@ public class PdfTweak {
 			if (currentReader.getPageRotation(i) != 0) needed=true;
 		}
 		if (!needed) return;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		OutputStream baos = createTempOutputStream();
 		Document document = new Document();
 		PdfWriter writer = PdfWriter.getInstance(document, baos);
 		PdfContentByte cb = null;
@@ -347,12 +387,12 @@ public class PdfTweak {
 			}
 		}
 		document.close();
-		currentReader = new PdfReader(baos.toByteArray());	
+		currentReader = getTempPdfReader(baos);	
 	}
 
 	public void scalePages(float newWidth, float newHeight, boolean noEnlarge, boolean preserveAspectRatio) throws DocumentException, IOException {
 		removeRotation();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		OutputStream baos = createTempOutputStream();
 		Rectangle newSize = new Rectangle(newWidth, newHeight);
 		Document document = new Document(newSize, 0, 0, 0, 0);
 		PdfWriter writer = PdfWriter.getInstance(document, baos);
@@ -406,12 +446,12 @@ public class PdfTweak {
 			}
 		}
 		document.close();
-		currentReader = new PdfReader(baos.toByteArray());
+		currentReader = getTempPdfReader(baos);
 	}
 
 	public void shufflePages(int passLength, ShuffleRule[] shuffleRules) throws DocumentException, IOException {
 		removeRotation();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		OutputStream baos = createTempOutputStream();
 		Rectangle size = currentReader.getPageSize(1);
 		for (int i = 1; i <= currentReader.getNumberOfPages(); i++) {
 			if (currentReader.getPageSize(i).getWidth() != size.getWidth() ||
@@ -539,7 +579,7 @@ public class PdfTweak {
 			}
 		}
 		document.close();
-		currentReader = new PdfReader(baos.toByteArray());		
+		currentReader = getTempPdfReader(baos);	
 	}
 
 	public void addPageMarks() {
@@ -563,15 +603,15 @@ public class PdfTweak {
 	}
 
 	public void updateBookmarks(PdfBookmark[] bm) throws DocumentException, IOException{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		OutputStream baos = createTempOutputStream();
 		PdfStamper stamper = new PdfStamper(currentReader, baos);
 		stamper.setOutlines(PdfBookmark.makeBookmarks(bm));
 		stamper.close();
-		currentReader = new PdfReader(baos.toByteArray());	
+		currentReader = getTempPdfReader(baos);
 	}
 
 	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, int pnPosition, int pnSize, float pnHOff, float pnVOff) throws DocumentException, IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+		OutputStream baos = createTempOutputStream();  
 		int pagecount = currentReader.getNumberOfPages();
 		PdfGState gs1 = new PdfGState();
 		gs1.setFillOpacity(wmOpacity);
@@ -635,7 +675,7 @@ public class PdfTweak {
 			}
 		}
 		stamper.close();
-		currentReader = new PdfReader(baos.toByteArray());
+		currentReader = getTempPdfReader(baos);
 	}
 
 	public int getPageCount() {
@@ -685,7 +725,7 @@ public class PdfTweak {
 			lbls.addPageLabel(format);			
 		}
 		Document document = new Document(currentReader.getPageSizeWithRotation(1));
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		OutputStream baos = createTempOutputStream();
 		PdfCopy copy = new PdfCopy(document, baos);
 		document.open();
 		PdfImportedPage page;
@@ -699,7 +739,7 @@ public class PdfTweak {
 		}
 		copy.setPageLabels(lbls);
 		document.close();
-		currentReader = new PdfReader(baos.toByteArray());
+		currentReader = getTempPdfReader(baos);
 	}
 
 	public void preserveHyperlinks() {

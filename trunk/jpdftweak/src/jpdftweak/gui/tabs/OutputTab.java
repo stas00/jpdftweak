@@ -22,11 +22,11 @@ import com.lowagie.text.DocumentException;
 public class OutputTab extends Tab {
 
 	private JTextField outputFile; 
-	private JCheckBox burst, uncompressed, pageMarks;
+	private JCheckBox burst, uncompressed, pageMarks, tempfiles;
 	private final MainForm mainForm;
 
 	public OutputTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		this.mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		this.add(new JLabel("Filename:"), cc.xy(1,1));
@@ -65,6 +65,7 @@ public class OutputTab extends Tab {
 				"<tt>&lt;P></tt>: Input file path without filename<br>" +
 				"<tt>&lt;#></tt>: Next free number (where file does not exist)<br>" +
 				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,5,3));
+		this.add(tempfiles = new JCheckBox("Use temporary files for intermediary results (saves RAM)"), cc.xyw(1,6,3));
 	}
 
 	@Override
@@ -76,6 +77,7 @@ public class OutputTab extends Tab {
 	public void checkRun() throws IOException {
 		if (outputFile.getText().length() == 0)
 			throw new IOException("No output file selected");  
+		mainForm.getInputTab().setUseTempFiles(tempfiles.isSelected());
 	}
 	
 	@Override

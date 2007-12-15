@@ -1,5 +1,6 @@
 package jpdftweak.gui;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -94,13 +95,15 @@ public class MainForm extends JFrame {
 	}
 
 	protected void runTweaks() {
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		PdfTweak tweak = null;
 		try {
 			for(Tab tab : tabs) {
 				tab.checkRun();
 			}
 			for(int task = 0; task < inputTab.getBatchLength(); task++) {
 				inputTab.selectBatchTask(task);
-				PdfTweak tweak = null;
+				tweak = null;
 				for(Tab tab: tabs) {
 					tweak = tab.run(tweak);
 				}
@@ -112,7 +115,13 @@ public class MainForm extends JFrame {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		} catch (OutOfMemoryError ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(this, "jPDF Tweak has run out of memory. You may configure Java so that it may use more RAM, or you can enable the Tempfile option on the output tab.", "Out of memory: "+ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+		} finally {
+			if (tweak != null) tweak.cleanup();
 		}
+		this.setCursor(null);
 	}
 
 	public JFileChooser getPdfChooser() {

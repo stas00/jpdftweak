@@ -43,6 +43,7 @@ public class CommandLineInterface {
 		String output = null;
 		boolean burstOutput = false, uncompressedOutput=false, markedOutput = false;
 		String password = "";
+		boolean useTempFiles = false;
 		
 		Pattern inputOption = Pattern.compile("-i((~?[0-9]+)(-(~?[0-9]+)?)?)?([eo]?)");
 		Pattern outputOption = Pattern.compile("-o[mub]*");
@@ -92,6 +93,7 @@ public class CommandLineInterface {
 					markedOutput = args[i].contains("m");
 					uncompressedOutput = args[i].contains("u");
 					burstOutput = args[i].contains("b");
+					useTempFiles = args[i].contains("t");
 				} else {
 					boolean handled = false;
 					for (CommandOption option : options) {
@@ -131,28 +133,32 @@ public class CommandLineInterface {
 		}
 		PdfTweak tweak;
 		if (input != null) {
-			tweak = new PdfTweak(input);
+			tweak = new PdfTweak(input, useTempFiles);
 		} else if (aliases.containsKey("master")) {
 			input = aliases.get("master");
-			tweak = new PdfTweak(input, pageRanges);
+			tweak = new PdfTweak(input, pageRanges, useTempFiles);
 		} else {
 			input = pageRanges.get(0).getInputFile();
-			tweak = new PdfTweak(input, pageRanges);
+			tweak = new PdfTweak(input, pageRanges, useTempFiles);
 		}
-		for (CommandOption option : options) {
-			option.run(tweak, input);
-		}
-		if (output == null) {
-			System.err.println("Cannot write PDF: No output file.");
-		} else {
-			if (markedOutput) {
-				if (uncompressedOutput)
-					tweak.addPageMarks();
-				else
-					tweak.removePageMarks();
+		try {
+			for (CommandOption option : options) {
+				option.run(tweak, input);
 			}
-			tweak.writeOutput(output, burstOutput, uncompressedOutput);
-			System.err.println("Output file written successfully.");
+			if (output == null) {
+				System.err.println("Cannot write PDF: No output file.");
+			} else {
+				if (markedOutput) {
+					if (uncompressedOutput)
+						tweak.addPageMarks();
+					else
+						tweak.removePageMarks();
+				}
+				tweak.writeOutput(output, burstOutput, uncompressedOutput);
+				System.err.println("Output file written successfully.");
+			}
+		} finally {
+			tweak.cleanup();
 		}
 	}
 
@@ -216,7 +222,8 @@ public class CommandLineInterface {
 					"Output files\n"+
 					"~~~~~~~~~~~~\n"+
 					"Use -o to specify the output filename; you can add flags:\n"+
-					"  -ou  save uncompressed, -om add Pdfmarks, -ob burst pages. \n"+
+					"  -ou  save uncompressed, -om add Pdfmarks, -ob burst pages,\n"+
+					"  -ot  use temp files. \n"+
 					"Flags can be combined like -oub.");	
 		} else {
 			System.out.println();
