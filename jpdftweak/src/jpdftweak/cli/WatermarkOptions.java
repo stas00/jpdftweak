@@ -1,5 +1,6 @@
 package jpdftweak.cli;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ public class WatermarkOptions implements CommandOption {
 	private String text = null;
 	private int textsize;
 	private float textopacity;
+	private Color textcolor;
 	
 	private int position = -1;
 	private int nsize;
@@ -32,7 +34,7 @@ public class WatermarkOptions implements CommandOption {
 			background = value;
 		}
 		if (option.equals("-watermark")) {
-			Matcher m = Pattern.compile("(.*),([0-9]+),([0-9.]+)").matcher(value);
+			Matcher m = Pattern.compile("(.*),([0-9]+),([0-9.]+)(,#[0-9a-fA-F]{6})?").matcher(value);
 			if (!m.matches()) {
 				System.err.println("Error: Invalid parameter for -watermark option");
 				return false;
@@ -40,6 +42,11 @@ public class WatermarkOptions implements CommandOption {
 			text = m.group(1);
 			textsize = Integer.parseInt(m.group(2));
 			textopacity = Float.parseFloat(m.group(3));
+			if (m.group(4) != null) {
+				textcolor = new Color(Integer.parseInt(m.group(4).substring(2,4),16),
+						Integer.parseInt(m.group(4).substring(4,6),16),
+						Integer.parseInt(m.group(4).substring(6,8),16));
+			}
 		}
 		if (option.equals("-numbers")) {
 			Matcher m = Pattern.compile("([LRTBC]|[LR][TB]),([0-9]+),(-?[0-9]+),(-?[0-9]+)").matcher(value);
@@ -66,7 +73,7 @@ public class WatermarkOptions implements CommandOption {
 			throws IOException, DocumentException {
 		if (background != null || text != null || position != -1) {
 			tweak.addWatermark(background == null ? null : new PdfInputFile(new File(background),""), 
-					text, textsize, textopacity, position, nsize, xoff, yoff);
+					text, textsize, textopacity, textcolor, position, nsize, xoff, yoff);
 		}		
 	}
 	
@@ -86,9 +93,9 @@ public class WatermarkOptions implements CommandOption {
 
 		} else if (option.equals("-watermark")) {
 			return
-				" -watermark {TEXT},{FONTSIZE},{OPACITY}\n"+
+				" -watermark {TEXT},{FONTSIZE},{OPACITY}[,#{RRGGBB}]\n"+
 				"    Add a text watermark. {OPACITY} is a float between 0 and 1,\n" +
-				"    for example 0.25.";
+				"    for example 0.25. {RRGGBB} is a HTML color.";
 		} else if (option.equals("-numbers")) {
 			return
 				" -numbers {POSITION},{FONTSIZE},{XOFFSET},{YOFFSET}\n"+
