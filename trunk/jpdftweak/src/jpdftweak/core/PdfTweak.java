@@ -1,5 +1,6 @@
 package jpdftweak.core;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -610,7 +611,7 @@ public class PdfTweak {
 		currentReader = getTempPdfReader(baos);
 	}
 
-	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, int pnPosition, int pnSize, float pnHOff, float pnVOff) throws DocumentException, IOException {
+	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, Color wmColor, int pnPosition, int pnSize, float pnHOff, float pnVOff) throws DocumentException, IOException {
 		OutputStream baos = createTempOutputStream();  
 		int pagecount = currentReader.getNumberOfPages();
 		PdfGState gs1 = new PdfGState();
@@ -658,6 +659,8 @@ public class PdfTweak {
 				overContent.saveState();
 				overContent.setGState(gs1);
 				overContent.beginText();
+				if (wmColor != null)
+					overContent.setColorFill(wmColor);
 				overContent.setFontAndSize(bf, wmSize);
 				overContent.setTextMatrix(m1, m2, m3, m4, xoff + size.getWidth() / 2,
 						yoff + size.getHeight() / 2);
