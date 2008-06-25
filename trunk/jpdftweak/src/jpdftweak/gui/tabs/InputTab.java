@@ -27,6 +27,7 @@ import jpdftweak.gui.TableComponent;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BadPasswordException;
 
 public class InputTab extends Tab {
 
@@ -116,18 +117,23 @@ public class InputTab extends Tab {
 		File file = pdfChooser.getSelectedFile();
 		PdfInputFile f;
 		try {
-			f = new PdfInputFile(file, "");
-		} catch (IOException ex) {
 			try {
-				char[] pwd = PasswordInputBox.askForPassword(mf);
-				if (pwd == null) return;
-				String password = new String(pwd);
-				f = new PdfInputFile(file, password);
-			} catch (IOException ex2) {
-				ex2.printStackTrace();
-				JOptionPane.showMessageDialog(mf, ex2.getMessage(), "Error reading input file", JOptionPane.ERROR_MESSAGE );
-				return;
+				f = new PdfInputFile(file, "");
+			} catch (BadPasswordException ex) {
+				try {
+					char[] pwd = PasswordInputBox.askForPassword(mf);
+					if (pwd == null) return;
+					String password = new String(pwd);
+					f = new PdfInputFile(file, password);
+				} catch (BadPasswordException ex2) {
+					JOptionPane.showMessageDialog(mf, "Bad owner password", "Cannot open input file", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(mf, ex.getMessage(), "Error reading input file", JOptionPane.ERROR_MESSAGE );
+			return;
 		}
 		inputFiles.add(f);
 		if (inputFiles.size() == 1) mf.setInputFile(f);

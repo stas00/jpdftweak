@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BadPasswordException;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfName;
@@ -36,7 +37,7 @@ public class PdfInputFile {
 		RandomAccessFileOrArray raf = new RandomAccessFileOrArray(file.getAbsolutePath(), false, true);
 		rdr = new PdfReader(raf, ownerPassword.getBytes("ISO-8859-1"));
 		if (!rdr.isOpenedWithFullPermissions())
-			throw new IOException("Invalid owner password");
+			throw new BadPasswordException();
 		rdr.consolidateNamedDestinations();
 		rdr.removeUnusedObjects();
 		rdr.shuffleSubsetNames();
