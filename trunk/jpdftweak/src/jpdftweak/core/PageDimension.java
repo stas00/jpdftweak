@@ -61,8 +61,8 @@ public class PageDimension {
 			addCommonSize(43, "Royal Quarto", PageSize.ROYAL_QUARTO);
 			addCommonSize(44, "Royal Octavo", PageSize.ROYAL_OCTAVO);
 			addCommonSize(45, "Small paperback", PageSize.SMALL_PAPERBACK);
-			addCommonSize(46, "Panguin small paperback", PageSize.PENGUIN_SMALL_PAPERBACK);
-			addCommonSize(47, "Panguin large paperback", PageSize.PENGUIN_LARGE_PAPERBACK);
+			addCommonSize(46, "Penguin small paperback", PageSize.PENGUIN_SMALL_PAPERBACK);
+			addCommonSize(47, "Penguin large paperback", PageSize.PENGUIN_LARGE_PAPERBACK);
 			commonSizes[96] =new PageDimension("Ledger", PageSize.LEDGER, false);
 			commonSizes[97] =new PageDimension("ISO 7810 ID-1", PageSize.ID_1, false);
 			commonSizes[98] =new PageDimension("ISO 7810 ID-2", PageSize.ID_2, false);
