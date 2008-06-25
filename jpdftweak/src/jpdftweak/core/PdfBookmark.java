@@ -31,6 +31,8 @@ public class PdfBookmark {
 		this.italic = italic;
 		this.page = page;
 		this.pagePosition = pagePosition;
+		if (moreOptions != null && moreOptions.length()==0)
+			moreOptions = null;
 		this.moreOptions = moreOptions;
 		if (moreOptions != null && !moreOptions.equals(makeString(parseString(moreOptions)))) {
 			throw new IllegalArgumentException("More options incorrect");
