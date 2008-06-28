@@ -22,11 +22,11 @@ import com.lowagie.text.DocumentException;
 public class OutputTab extends Tab {
 
 	private JTextField outputFile; 
-	private JCheckBox burst, uncompressed, pageMarks, tempfiles;
+	private JCheckBox burst, uncompressed, pageMarks, tempfiles, optimizeSize;
 	private final MainForm mainForm;
 
 	public OutputTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		this.mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		this.add(new JLabel("Filename:"), cc.xy(1,1));
@@ -66,6 +66,7 @@ public class OutputTab extends Tab {
 				"<tt>&lt;#></tt>: Next free number (where file does not exist)<br>" +
 				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,5,3));
 		this.add(tempfiles = new JCheckBox("Use temporary files for intermediary results (saves RAM)"), cc.xyw(1,6,3));
+		this.add(optimizeSize = new JCheckBox("Optimize PDF size (will need a lot of RAM)"), cc.xyw(1,7,3));
 	}
 
 	@Override
@@ -89,7 +90,7 @@ public class OutputTab extends Tab {
 				tweak.removePageMarks();
 			}
 		}
-		tweak.writeOutput(outputFile.getText(), burst.isSelected(), uncompressed.isSelected());
+		tweak.writeOutput(outputFile.getText(), burst.isSelected(), uncompressed.isSelected(), optimizeSize.isSelected());
 		return null;
 	}
 }
