@@ -35,6 +35,7 @@ import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfPageLabels;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
+import com.lowagie.text.pdf.PdfSmartCopy;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfTemplate;
@@ -220,7 +221,24 @@ public class PdfTweak {
 		}
 	}
 
-	public void writeOutput(String outputFile, boolean burst, boolean uncompressed) throws IOException, DocumentException {
+	public void writeOutput(String outputFile, boolean burst, boolean uncompressed, boolean sizeOptimize) throws IOException, DocumentException {
+		if (sizeOptimize) {
+			Document document = new Document(currentReader.getPageSizeWithRotation(1));
+			OutputStream baos = createTempOutputStream();
+			PdfSmartCopy copy = new PdfSmartCopy(document, baos);
+			document.open();
+			PdfImportedPage page;
+			for(int i=0; i<currentReader.getNumberOfPages(); i++) {
+				page = copy.getImportedPage(currentReader, i+1);
+				copy.addPage(page);
+			}
+			PRAcroForm form = currentReader.getAcroForm();
+			if (form != null) {
+				copy.copyAcroForm(currentReader);
+			}
+			document.close();
+			currentReader = getTempPdfReader(baos);
+		}
 		outputFile = outputFile.replace("<F>", inputFileName);
 		outputFile = outputFile.replace("<FX>", inputFileFullName);
 		outputFile = outputFile.replace("<P>", inputFilePath);
