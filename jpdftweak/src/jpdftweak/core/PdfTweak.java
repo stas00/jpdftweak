@@ -40,6 +40,7 @@ import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfTransition;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.RandomAccessFileOrArray;
 import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 import com.lowagie.text.pdf.interfaces.PdfEncryptionSettings;
 
@@ -166,7 +167,7 @@ public class PdfTweak {
 	
 	private PdfReader getTempPdfReader(OutputStream out) throws IOException {
 		if (tempfile1 != null) {
-			return new PdfReader(tempfile1.getPath());
+			return new PdfReader(new RandomAccessFileOrArray(tempfile1.getPath(), false, true), null);
 		} else {
 			byte[] bytes = ((ByteArrayOutputStream)out).toByteArray();
 			return new PdfReader(bytes);
