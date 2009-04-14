@@ -12,6 +12,3 @@
 -keep public class jpdftweak.Main {
     public static void main(java.lang.String[]);
 }
-
-# this class uses package-local resources
--keep public class com.lowagie.text.pdf.codec.postscript.PAContext
