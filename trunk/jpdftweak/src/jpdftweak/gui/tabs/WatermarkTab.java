@@ -26,14 +26,14 @@ import jpdftweak.gui.MainForm;
 public class WatermarkTab extends Tab {
 
 	private MainForm mainForm;
-	private JCheckBox pdfWatermark, textWatermark, pageNumbers, watermarkUseColor;
-	private JTextField filename, pgnoSize, pgnoHOffset, pgnoVOffset;
+	private JCheckBox pdfWatermark, textWatermark, pageNumbers, watermarkUseColor, useMask;
+	private JTextField filename, pgnoSize, pgnoHOffset, pgnoVOffset, maskText;
 	private JTextField watermarkText, watermarkSize, watermarkOpacity;
 	private JComboBox pgnoHRef, pgnoVRef;
 	private JButton fileButton, watermarkColor;
 	
 	public WatermarkTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, 80dlu, f:p", "f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, 80dlu, f:p", "f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		add(pdfWatermark = new JCheckBox("Add first page of PDF as background watermark"), cc.xyw(1, 1, 4));
@@ -91,6 +91,13 @@ public class WatermarkTab extends Tab {
 		add(new JLabel("Vertical:"), cc.xy(1, 13));
 		add(pgnoVOffset = new JTextField("25"), cc.xy(2, 13));
 		add(pgnoVRef = new JComboBox(new String[] {"PS points from bottom margin", "PS points from center", "PS points from top margin"}), cc.xyw(3, 13, 2));
+		add(useMask = new JCheckBox("Mask: "), cc.xy(1, 14));	
+		useMask.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updatePageNumbersEnabled();
+			}
+		});
+		add(maskText = new JTextField("Page %d of %d"), cc.xyw(2, 14, 3));
 		updatePDFWatermarkEnabled();
 		updateTextWatermarkEnabled();
 		updatePageNumbersEnabled();
@@ -115,6 +122,8 @@ public class WatermarkTab extends Tab {
 		pgnoVOffset.setEnabled(pageNumbers.isSelected());
 		pgnoHRef.setEnabled(pageNumbers.isSelected());
 		pgnoVRef.setEnabled(pageNumbers.isSelected());
+		useMask.setEnabled(pageNumbers.isSelected());
+		maskText.setEnabled(pageNumbers.isSelected() && useMask.isSelected());
 	}
 	
 	@Override
@@ -130,6 +139,7 @@ public class WatermarkTab extends Tab {
 		int wmSize=0, pnSize=0, pnPosition=-1;
 		float wmOpacity=0, pnHOff=0, pnVOff=0;
 		Color wmColor = null;
+		String mask = null;
 		try {
 			if (pdfWatermark.isSelected()) {
 				run = true;
@@ -151,11 +161,14 @@ public class WatermarkTab extends Tab {
 			if (watermarkUseColor.isSelected()) {
 				wmColor = watermarkColor.getBackground();
 			}
+			if (useMask.isSelected()) {
+				mask = maskText.getText();
+			}
 		} catch (NumberFormatException ex) {
 			throw new IOException("Unparsable value: "+ex.getMessage());
 		}
 		if (run) {
-			tweak.addWatermark(wmFile, wmText, wmSize, wmOpacity, wmColor, pnPosition, pnSize, pnHOff, pnVOff);
+			tweak.addWatermark(wmFile, wmText, wmSize, wmOpacity, wmColor, pnPosition, pnSize, pnHOff, pnVOff, mask);
 		}
 		return tweak;
 	}
