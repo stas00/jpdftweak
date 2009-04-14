@@ -111,6 +111,7 @@ public class PdfTweak {
 	private final String inputFilePath, inputFileName, inputFileFullName;
 	private boolean preserveHyperlinks;
 	private File tempfile1 = null, tempfile2 = null;
+	private List<File> inputFiles = new ArrayList<File>();
 
 	public PdfTweak(PdfInputFile singleFile, boolean useTempFiles) throws IOException {
 		if (useTempFiles) {
@@ -129,6 +130,7 @@ public class PdfTweak {
 		} else {
 			inputFileName = inputFileFullName.substring(0, pos);
 		}
+		inputFiles.add(f.getCanonicalFile());
 	}
 
 	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges, boolean useTempFiles) throws IOException, DocumentException {
@@ -145,6 +147,9 @@ public class PdfTweak {
 				page = pageRange.getInputFile().getImportedPage(copy, pages[i]);
 				copy.addPage(page);
 			}
+			File f = pageRange.getInputFile().getFile().getCanonicalFile();
+			if (!inputFiles.contains(f))
+				inputFiles.add(f);
 		}
 		PRAcroForm form = firstReader.getAcroForm();
 		if (form != null) {
@@ -209,11 +214,13 @@ public class PdfTweak {
 		}	
 	}
 
-	public void setEncryption(int mode, int permissions, byte[] ownerPassword, byte[] userPassword) {
+	public void setEncryption(int mode, int permissions, byte[] ownerPassword, byte[] userPassword) throws IOException {
 		this.encryptionMode = mode;
 		this.encryptionPermissions = permissions;
 		this.userPassword = userPassword;
 		this.ownerPassword = ownerPassword;
+		if (ownerPassword.length == 0)
+			throw new IOException("Owner password may not be empty");
 	}
 
 	private void setEncryptionSettings(PdfEncryptionSettings w) throws DocumentException {
@@ -252,6 +259,8 @@ public class PdfTweak {
 				}
 			}
 		}
+		if (inputFiles.contains(new File(outputFile).getCanonicalFile()))
+			throw new IOException("Output file must be different from input file(s)");
 		cargoCult();
 		try {
 			if (uncompressed) {
