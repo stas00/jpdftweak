@@ -24,6 +24,7 @@ public class WatermarkOptions implements CommandOption {
 	private int position = -1;
 	private int nsize;
 	private float xoff, yoff;
+	private String mask;
 	
 	public boolean supportsOption(String option) {
 		return option.equals("-background") || option.equals("-watermark") ||  option.equals("-numbers");
@@ -49,7 +50,7 @@ public class WatermarkOptions implements CommandOption {
 			}
 		}
 		if (option.equals("-numbers")) {
-			Matcher m = Pattern.compile("([LRTBC]|[LR][TB]),([0-9]+),(-?[0-9]+),(-?[0-9]+)").matcher(value);
+			Matcher m = Pattern.compile("([LRTBC]|[LR][TB]),([0-9]+),(-?[0-9]+),(-?[0-9]+)(,.+)?").matcher(value);
 			if (!m.matches()) {
 				System.err.println("Error: Invalid parameter for -numbers option");
 				return false;	
@@ -65,6 +66,7 @@ public class WatermarkOptions implements CommandOption {
 			nsize = Integer.parseInt(m.group(2));
 			xoff = Integer.parseInt(m.group(3));
 			yoff = Integer.parseInt(m.group(4));
+			mask = m.group(5) == null ? null : m.group(5).substring(1);
 		}
 		return true;
 	}
@@ -73,7 +75,7 @@ public class WatermarkOptions implements CommandOption {
 			throws IOException, DocumentException {
 		if (background != null || text != null || position != -1) {
 			tweak.addWatermark(background == null ? null : new PdfInputFile(new File(background),""), 
-					text, textsize, textopacity, textcolor, position, nsize, xoff, yoff);
+					text, textsize, textopacity, textcolor, position, nsize, xoff, yoff, mask);
 		}		
 	}
 	
@@ -98,7 +100,7 @@ public class WatermarkOptions implements CommandOption {
 				"    for example 0.25. {RRGGBB} is a HTML color.";
 		} else if (option.equals("-numbers")) {
 			return
-				" -numbers {POSITION},{FONTSIZE},{XOFFSET},{YOFFSET}\n"+
+				" -numbers {POSITION},{FONTSIZE},{XOFFSET},{YOFFSET}{,MASK}\n"+
 				"    Add page numbers. {XOFFSET} and {YOFFSET} are in PostScript\n" +
 				"    points. {POSITION} may be one of:\n\n" +
 				"        L left edge\n" +

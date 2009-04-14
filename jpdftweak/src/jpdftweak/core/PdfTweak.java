@@ -12,6 +12,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
 
@@ -630,7 +631,7 @@ public class PdfTweak {
 		currentReader = getTempPdfReader(baos);
 	}
 
-	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, Color wmColor, int pnPosition, int pnSize, float pnHOff, float pnVOff) throws DocumentException, IOException {
+	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, Color wmColor, int pnPosition, int pnSize, float pnHOff, float pnVOff, String mask) throws DocumentException, IOException {
 		OutputStream baos = createTempOutputStream();  
 		int pagecount = currentReader.getNumberOfPages();
 		PdfGState gs1 = new PdfGState();
@@ -692,7 +693,15 @@ public class PdfTweak {
 				overContent.setFontAndSize(bf, pnSize);
 				float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.getWidth() * (pnPosition % 3) / 2.0f;
 				float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.getHeight() * (pnPosition / 3) / 2.0f;
-				overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, ""+i, xx, yy, 0);
+				String number = "" + i;
+				if (mask != null && mask.length() > 0) {
+					try {
+						number = String.format(mask, i, pagecount);
+					} catch (IllegalFormatException ex) {
+						throw new IOException(ex.toString());
+					}
+				}
+				overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, number, xx, yy, 0);
 				overContent.endText();
 			}
 		}
