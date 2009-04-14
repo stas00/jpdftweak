@@ -4,7 +4,7 @@ OBTAINING LIBRARIES
 To compile jPDFtweak, you need the following libraries:
 
 * iText, available from http://www.lowagie.com/iText
-  Version 2.1.2u or newer
+  Version 2.1.5 or newer
   -> itext.jar
 
 * BouncyCastle (Provider and Mail), available from 
@@ -15,12 +15,12 @@ To compile jPDFtweak, you need the following libraries:
   -> bcmail.jar
 
 * JGoodies Forms, available from http://www.jgoodies.com/freeware/forms/
-  Version 1.1.0 or newer
+  Version 1.2.1 or newer
   -> forms.jar
 
 You can obtain the precompiled files from the "-shared" binary package,
 if you do not want to collect/compile them yourself.
 
-To compile the "-static jar", you will also need proguard, version 3.10.1,
+To compile the "-static jar", you will also need proguard, version 4.3,
 available from http://proguard.sourceforge.net/
   -> proguard.jar

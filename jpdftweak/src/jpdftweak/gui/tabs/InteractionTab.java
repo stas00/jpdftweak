@@ -67,7 +67,7 @@ public class InteractionTab extends Tab {
 		panel2.add(new JSeparator(), cc.xyw(1, 4, 2));
 		for(int i=0; i<ViewerPreference.SUPPORTED_VIEWER_PREFERENCES.length; i++) {
 			ViewerPreference vp = ViewerPreference.SUPPORTED_VIEWER_PREFERENCES[i];
-			fl.appendRow(new RowSpec("f:p"));
+			fl.appendRow(RowSpec.decode("f:p"));
 			panel2.add(optionalPrefCheck[i] = new JCheckBox(vp.getName()+": "), cc.xy(1,i+5));
 			panel2.add(optionalPrefValue[i] = new JComboBox(vp.getPossibleValues()), cc.xy(2,i+5));			
 			optionalPrefCheck[i].addActionListener(updateListener);
