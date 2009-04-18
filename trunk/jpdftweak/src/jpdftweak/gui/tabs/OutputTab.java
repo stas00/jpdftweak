@@ -59,14 +59,14 @@ public class OutputTab extends Tab {
 						" PdfTk page marks");
 			}
 		});
+		this.add(tempfiles = new JCheckBox("Use temporary files for intermediary results (saves RAM)"), cc.xyw(1,5,3));
+		this.add(optimizeSize = new JCheckBox("Optimize PDF size (will need a lot of RAM)"), cc.xyw(1,6,3));
 		this.add(new JLabel("<html>You can use the following variables in the output filename:<br>" +
 				"<tt>&lt;F></tt>: Input filename without extension<br>"+
 				"<tt>&lt;FX></tt>: Input filename with extension<br>" +
 				"<tt>&lt;P></tt>: Input file path without filename<br>" +
 				"<tt>&lt;#></tt>: Next free number (where file does not exist)<br>" +
-				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,5,3));
-		this.add(tempfiles = new JCheckBox("Use temporary files for intermediary results (saves RAM)"), cc.xyw(1,6,3));
-		this.add(optimizeSize = new JCheckBox("Optimize PDF size (will need a lot of RAM)"), cc.xyw(1,7,3));
+				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,7,3));
 	}
 
 	@Override

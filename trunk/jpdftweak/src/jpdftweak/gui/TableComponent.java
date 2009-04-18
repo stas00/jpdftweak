@@ -30,6 +30,8 @@ public class TableComponent extends JPanel {
 		add(add = new JButton("Add"), cc.xy(1, 2));
 		add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (jt.getCellEditor() != null)
+			        jt.getCellEditor().stopCellEditing();
 				tcm.addRow(TableComponent.this.sample);
 			}
 		});
@@ -39,6 +41,8 @@ public class TableComponent extends JPanel {
 				int sel = jt.getSelectedRow();
 				if (sel ==-1 || sel == 0)
 					return;
+				if (jt.getCellEditor() != null)
+			        jt.getCellEditor().stopCellEditing();
 				tcm.moveRow(sel, -1);
 				jt.getSelectionModel().setSelectionInterval(sel-1, sel-1);		
 			}
@@ -49,6 +53,8 @@ public class TableComponent extends JPanel {
 				int sel = jt.getSelectedRow();
 				if (sel ==-1 || sel == tcm.getRowCount()-1)
 					return;
+				if (jt.getCellEditor() != null)
+			        jt.getCellEditor().stopCellEditing();
 				tcm.moveRow(sel, 1);
 				jt.getSelectionModel().setSelectionInterval(sel+1, sel+1);		
 			}
@@ -58,6 +64,8 @@ public class TableComponent extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				for (int i = jt.getSelectedRowCount()-1; i >= 0; i--) {
 					int row = jt.getSelectedRows()[i];
+					if (jt.getCellEditor() != null)
+				        jt.getCellEditor().stopCellEditing();
 					tcm.deleteRow(row);
 				}
 			}
