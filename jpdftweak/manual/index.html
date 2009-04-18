@@ -95,6 +95,12 @@ or running</p>
 <p>Text watermark and page numbers use the built-in Helvetica font
   (similar to Arial on Windows systems).</p>
 
+<p>If plain numbers are not enough for you, you can use a mask to
+format your numbers. This mask uses the same syntax as the standard
+Java <a href="http://java.sun.com/j2se/1.5/docs/api/java/util/Formatter.html#syntax">formatting
+function</a>, and supports the current page number and the total
+number of pages as parameters.</p>
+
 <h3>The Shuffle/N-up Tab</h3>
 <p><img src="shot04.png" width="713" height="544" alt="Shuffle/N-up Options"></p>
 
@@ -127,6 +133,44 @@ or running</p>
   document (see previous tab) so you can see quickly if your config is
   correct.</p>
 
+<h3>The Page Numbers Tab</h3>
+<p><i>(No screenshot available)</i></p>
+
+<p>Here you can tweak the page numbers that appear in your PDF
+reader. Depending on your PDF reader, they can be used for displaying
+the current page in the toolbar and status bar, jumping to a page by
+its number and/or printing page ranges. Most printed documents have
+some kind of title pages and or table of contents that are outside of
+the page numbers or are numbered with Roman numbers. This makes it
+hard if you read about something "on page 200" to jump to this page
+200, because it will be the 205<sup>th</sup> page and not the
+200<sup>th</sup> if there are five pages before page 1.</p>
+
+<p>Note that these page numbers do not appear on the page itself. For
+this kind of numbers, there is an option on the "Watermark" tab.</p>
+
+<p>To just change the number of the first physical page, click "Add"
+once, leave the "Start Page" at one and change the other controls. If
+you want to have "gaps" in your page numbers, add more lines and use
+"Start page" to point to the physical page numbers (i. e. those that
+start from 1) where the format should change.</p>
+
+<p>Assume you have a 6 page PDF, and you set it up as follows:
+<table border="1" style="margin: 5px; border: 1px solid gray; border-collapse: collapse">
+<tr><th>Start Page</th><th>Style</th><th>Prefix</th><th>Logical Page</th></tr>
+<tr><td>1</td><td>Empty</td><td>Title</td><td>1</td></tr>
+<tr><td>2</td><td>I, II, III</td><td>&nbsp;</td><td>4</td></tr>
+<tr><td>5</td><td>1, 2, 3</td><td>S</td><td>32</td></tr>
+</table>
+
+<p>Then the six pages will have numbers <tt>Title</tt>, <tt>IV</tt>,
+<tt>V</tt>, <tt>VI</tt>, <tt>S32</tt>, <tt>S33</tt>.</p>
+
+<p>Be careful that your document does not end up having two pages with
+the same number (as represented as text) - some versions of Adobe
+Reader don't really like that. You can work around it by setting a
+prefix for these pages or use different number styles.</p>
+
 <h3>The Bookmarks Tab</h3>
 <p><img src="shot05.png" width="713" height="544" alt="Bookmark Options"></p>
 
@@ -134,6 +178,13 @@ or running</p>
 input file, chapter bookmarks will be combined automatically. But if
 you select individual pages or ranges instead of the full document,
 you will have to tweak the bookmarks manually.</p>
+
+<p>If you want to create bookmarks from scratch, it is useful to open
+existing PDFs and look what the bookmarks look like in there. If you
+want to add bookmarks that do not only point to a page but to a
+position on a page, you might need a tool like GSView (from
+GhostScript) which shows coordinates when moving the cursor on a PDF
+file.</p>
 
 <h3>The Attachments Tab</h3>
 <p><img src="shot06.png" width="713" height="544" alt="Attachment Options"></p>
