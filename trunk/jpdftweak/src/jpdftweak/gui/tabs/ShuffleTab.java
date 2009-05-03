@@ -105,7 +105,7 @@ public class ShuffleTab extends Tab {
 				parseGUI();
 			}
 		});
-		panel1.add(shuffleRulesTable = new TableComponent(new String[]{"Page", "OffsetX", "OffsetY", "ScaleFactor", "Rotate", "NewPageBefore", "FrameWidth"}, new Class[] {String.class, String.class, String.class,  Double.class, String.class, Boolean.class, Double.class}, new Object[] {"+1", "0%", "0%", 1.0, "None", true, 0}), cc.xyw(1, 6, 4));
+		panel1.add(shuffleRulesTable = new TableComponent(new String[]{"Page", "OffsetX", "OffsetY", "ScaleFactor", "Rotate", "NewPageBefore", "FrameWidth"}, new Class[] {String.class, String.class, String.class,  Double.class, String.class, Boolean.class, Double.class}, new Object[] {"+1", "0%", "0%", 1.0, "None", true, 0.0}), cc.xyw(1, 6, 4));
 		JComboBox rotateValues = new JComboBox(new String[] {"None", "Left", "Upside-Down", "Right"});
 		shuffleRulesTable.getTable().getColumnModel().getColumn(4).setCellEditor(new DefaultCellEditor(rotateValues));
 		shuffleRulesTable.getScrollPane().setPreferredSize(new Dimension(400, 100));
@@ -152,6 +152,9 @@ public class ShuffleTab extends Tab {
 		} catch (NumberFormatException ex) {
 			JOptionPane.showMessageDialog(mf, "Unparsable option: "+ex.getMessage());
 			return;
+		} catch (NullPointerException ex) {
+			JOptionPane.showMessageDialog(mf, "Please fill in all the fields.");
+			return;			
 		}
 		configString.setText(sb.toString());
 		parseConfigString();
