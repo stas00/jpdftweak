@@ -5,6 +5,7 @@
 	<property name="ITEXT" value="${LIB}/itext.jar" />
 	<property name="BCPROV" value="${LIB}/bcprov.jar" />
 	<property name="BCMAIL" value="${LIB}/bcmail.jar" />
+	<property name="BCTSP" value="${LIB}/bctsp.jar" />
 	<property name="FORMS" value="${LIB}/forms.jar" />
 	<property name="PROGUARD" value="${LIB}/proguard.jar" />
 
@@ -15,7 +16,7 @@
 
 	<target name="compile">
 		<mkdir dir="build/bin" />
-		<javac srcdir="src" destdir="build/bin">
+		<javac srcdir="src" destdir="build/bin" source="1.5" target="1.5">
 			<classpath>
 				<pathelement path="${ITEXT}" />
 				<pathelement path="${FORMS}" />
@@ -27,7 +28,7 @@
 		<jar destfile="jpdftweak.jar" basedir="build/bin">
 			<manifest>
 				<attribute name="Main-Class" value="jpdftweak.Main"/>
-				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/forms.jar"/>
+				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar"/>
 			</manifest>
 		</jar>
 	</target>
@@ -44,6 +45,7 @@
 				<include name="${ITEXT}"/>
 				<include name="${BCPROV}"/>
 				<include name="${BCMAIL}"/>
+				<include name="${BCTSP}"/>
 				<include name="${FORMS}"/>
 			</fileset>
 			<patternset>
