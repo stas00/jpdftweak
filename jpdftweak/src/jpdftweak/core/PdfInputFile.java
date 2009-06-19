@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jpdftweak.Main;
+
+import com.lowagie.text.Document;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
 import com.lowagie.text.pdf.PdfDictionary;
@@ -90,6 +93,9 @@ public class PdfInputFile {
 					result.put(key.toString().substring(1), value);
 				}
 			}
+		}
+		if (result.containsKey("Producer") && result.get("Producer").indexOf(Document.getProduct()) == -1) {
+			result.put("Producer", result.get("Producer") + "; modified by jPDF Tweak " + Main.VERSION + " (based on " + Document.getVersion() + ")");
 		}
 		return result;
 	}
