@@ -156,7 +156,7 @@ public class PdfTweak {
 			copy.copyAcroForm(firstReader);
 		}
 		document.close();
-		currentReader = getTempPdfReader(baos);
+		copyInformation(firstReader, currentReader = getTempPdfReader(baos));
 	}
 	
 	private OutputStream createTempOutputStream() throws IOException {
@@ -213,6 +213,25 @@ public class PdfTweak {
 			}
 		}	
 	}
+	
+	private void copyInformation(PdfReader source, PdfReader destination) 
+	{
+		PdfDictionary srcTrailer = source.getTrailer();
+		PdfDictionary dstTrailer = destination.getTrailer();
+		if(srcTrailer != null && srcTrailer.isDictionary() && dstTrailer != null && dstTrailer.isDictionary()) {
+			PdfObject srcInfo = PdfReader.getPdfObject(srcTrailer.get(PdfName.INFO));
+			PdfObject dstInfo = PdfReader.getPdfObject(dstTrailer.get(PdfName.INFO));
+			if (srcInfo != null && srcInfo.isDictionary() && dstInfo != null && dstInfo.isDictionary()) {
+				PdfDictionary srcInfoDic = (PdfDictionary) srcInfo;
+				PdfDictionary dstInfoDic = (PdfDictionary) dstInfo;
+				for (Object k : srcInfoDic.getKeys()) {
+					PdfName key = (PdfName) k;
+					PdfObject value = srcInfoDic.get(key);
+					dstInfoDic.put(key, value);
+				}
+			}
+		}	
+	}
 
 	public void setEncryption(int mode, int permissions, byte[] ownerPassword, byte[] userPassword) throws IOException {
 		this.encryptionMode = mode;
@@ -245,7 +264,7 @@ public class PdfTweak {
 				copy.copyAcroForm(currentReader);
 			}
 			document.close();
-			currentReader = getTempPdfReader(baos);
+			copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 		}
 		outputFile = outputFile.replace("<F>", inputFileName);
 		outputFile = outputFile.replace("<FX>", inputFileFullName);
@@ -259,7 +278,7 @@ public class PdfTweak {
 				}
 			}
 		}
-		if (inputFiles.contains(new File(outputFile).getCanonicalFile()))
+		if (!burst && inputFiles.contains(new File(outputFile).getCanonicalFile()))
 			throw new IOException("Output file must be different from input file(s)");
 		cargoCult();
 		try {
@@ -275,6 +294,8 @@ public class PdfTweak {
 				String suffix = fn.substring(fn.indexOf('*')+1);
 				for(int pagenum=1; pagenum <= currentReader.getNumberOfPages(); pagenum++) {
 					Document document = new Document(currentReader.getPageSizeWithRotation(1));
+					if (inputFiles.contains(new File(prefix+pagenum+suffix).getCanonicalFile()))
+						throw new IOException("Output file must be different from input file(s)");
 					PdfCopy copy = new PdfCopy(document,
 							new FileOutputStream(prefix+pagenum+suffix));
 					setEncryptionSettings(copy);
@@ -417,7 +438,7 @@ public class PdfTweak {
 			}
 		}
 		document.close();
-		currentReader = getTempPdfReader(baos);	
+		copyInformation(currentReader, currentReader = getTempPdfReader(baos));	
 	}
 
 	public void scalePages(float newWidth, float newHeight, boolean noEnlarge, boolean preserveAspectRatio) throws DocumentException, IOException {
@@ -476,7 +497,7 @@ public class PdfTweak {
 			}
 		}
 		document.close();
-		currentReader = getTempPdfReader(baos);
+		copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 	}
 
 	public void shufflePages(int passLength, ShuffleRule[] shuffleRules) throws DocumentException, IOException {
@@ -609,7 +630,7 @@ public class PdfTweak {
 			}
 		}
 		document.close();
-		currentReader = getTempPdfReader(baos);	
+		copyInformation(currentReader, currentReader = getTempPdfReader(baos));	
 	}
 
 	public void addPageMarks() {
@@ -779,7 +800,7 @@ public class PdfTweak {
 		}
 		copy.setPageLabels(lbls);
 		document.close();
-		currentReader = getTempPdfReader(baos);
+		copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 	}
 
 	public void preserveHyperlinks() {
