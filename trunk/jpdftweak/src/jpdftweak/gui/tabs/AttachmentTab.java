@@ -40,7 +40,7 @@ public class AttachmentTab extends Tab {
 		remove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int[] idxs = list.getSelectedIndices();
-				for (int i = idxs.length-1; i >= 0 ;i++) {
+				for (int i = idxs.length-1; i >= 0 ;i--) {
 					lm.remove(idxs[i]);
 				}
 			}
