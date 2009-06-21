@@ -170,6 +170,8 @@ public class WatermarkTab extends Tab {
 		if (run) {
 			tweak.addWatermark(wmFile, wmText, wmSize, wmOpacity, wmColor, pnPosition, pnSize, pnHOff, pnVOff, mask);
 		}
+		if (wmFile != null)
+			wmFile.close();
 		return tweak;
 	}
 }

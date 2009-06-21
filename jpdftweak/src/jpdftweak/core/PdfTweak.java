@@ -230,7 +230,8 @@ public class PdfTweak {
 					dstInfoDic.put(key, value);
 				}
 			}
-		}	
+		}
+		source.close();
 	}
 
 	public void setEncryption(int mode, int permissions, byte[] ownerPassword, byte[] userPassword) throws IOException {

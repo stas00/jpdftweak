@@ -59,6 +59,9 @@ public class InputTab extends Tab {
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				filesCombo.removeAllItems();
+				for(PdfInputFile f : inputFiles) {
+					f.close();
+				}
 				inputFiles.clear();
 				InputTab.this.mf.setInputFile(null);
 				fileCombination.clear();
