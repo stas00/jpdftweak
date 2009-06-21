@@ -48,7 +48,7 @@ public class PageNumberTab extends Tab {
 				PdfPageLabelFormat[] lbls = mainForm.getInputFile().getPageLabels();
 				if (lbls != null) {
 				for (PdfPageLabelFormat lbl : lbls) {
-					pageNumberRanges.addRow(lbl.logicalPage, NUMBER_STYLES[lbl.numberStyle], lbl.prefix, lbl.logicalPage);
+					pageNumberRanges.addRow(lbl.physicalPage, NUMBER_STYLES[lbl.numberStyle], lbl.prefix, lbl.logicalPage);
 				}
 				}
 			}
