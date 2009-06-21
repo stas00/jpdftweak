@@ -46,8 +46,12 @@ public class PdfInputFile {
 		rdr.shuffleSubsetNames();
 	}
 
-	public void reopen() throws IOException {
+	public void close() {
 		rdr.close();
+	}
+
+	public void reopen() throws IOException {
+		close();
 		open();
 	}
 

@@ -66,6 +66,7 @@ public class BookmarkTab extends Tab {
 						PdfInputFile pif = new PdfInputFile(chooser.getSelectedFile(), "");
 						bookmarks.clear();
 						appendBookmarks(pif.getBookmarks(1));
+						pif.close();
 					} catch (IOException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(mainForm, ex.getMessage(), "Error reading file", JOptionPane.ERROR_MESSAGE);
