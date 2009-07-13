@@ -14,6 +14,25 @@ if they are present in the "normal" version as well.
 
 See the "manual" folder for short manual.
 
+Java Memory Limit
+~~~~~~~~~~~~~~~~~
+
+By default, a Java program may only access up to 64 MB of RAM. When
+processing large PDFs, this can cause out of memory errors.
+
+You can increase the memory that will be used by jPDF Tweak by editing
+the jpdftweak.bat file with a text editor; change
+
+@java -jar jpdftweak.jar %*
+
+to for example
+
+@java -Xmx256M -jar jpdftweak.jar %*
+
+to allow for 256 MB of RAM. Alternatively, if you want to perform lots 
+of operations, you can check the "Use temporary files" option on the
+Output tab.
+
 License
 ~~~~~~~
 
@@ -27,6 +46,34 @@ Please send bug reports and suggestions to <schierlm@users.sourceforge.net>.
 
 ChangeLog
 ~~~~~~~~~
+
++++ 2009-07-13 Released version 0.9.5
+
+- update to iText 2.1.7, BouncyCastle 1.43 and JGoodies Forms 1.2.1
+- Add option to change mask used for printing page numbers
+  (to do things like "Page 2 of 11").
+- New "optimize for size" option
+- Add an option to save intermediary results into temporary files
+- Add color option for text watermark
+- Add "Tile Copy" shuffle rules by Stefan Michel
+- Show a red ugly dialog box when a fatal exception occurs
+- Complain if output file is one of the input files
+- Complain when setting permissions without setting an owner password
+- bug fixes:
+  * Do not show logical page twice (once instead of physical page) when
+    loading page numbers.
+  * Close all input/output streams when finished.
+  * Fix exception when removing elements from the attachment tab
+  * Copy info dictionary after every operation that might destroy it.
+  * fix a ClassCastException and catch NullPointerException 
+    when trying to parse shuffle rules.
+  * fix crash when deleting a row in a table when a cell editor is active
+  * catch BadPasswordException to only show a password prompt when the reason
+    is really a bad password
+  * Fix adding new PDF bookmarks to a PDF file that did not have any
+  * Fix a typo in "Penguin Small/Large Paperback" page size
+  * catch OutOfMemoryError and display an error message
+
 
 +++ 2007-09-10 Released version 0.9
 
