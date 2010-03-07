@@ -2,7 +2,7 @@ package jpdftweak.cli;
 
 import java.io.IOException;
 
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;

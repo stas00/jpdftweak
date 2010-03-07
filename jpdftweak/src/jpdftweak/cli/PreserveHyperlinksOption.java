@@ -5,7 +5,7 @@ import java.io.IOException;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 public class PreserveHyperlinksOption implements CommandOption {
 

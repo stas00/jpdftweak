@@ -36,8 +36,10 @@ Output tab.
 License
 ~~~~~~~
 
-jPDF Tweak is licensed under GNU General Public License Version 2,
-see license.txt.
+jPDF Tweak is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version. See license.txt.
 
 Contact me
 ~~~~~~~~~~

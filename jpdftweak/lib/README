@@ -4,7 +4,7 @@ OBTAINING LIBRARIES
 To compile jPDFtweak, you need the following libraries:
 
 * iText, available from http://www.lowagie.com/iText
-  Version 2.1.7 or newer
+  Version 5.0.1 or newer
   -> itext.jar
 
 * BouncyCastle (Provider and Mail), available from 

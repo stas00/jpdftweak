@@ -26,10 +26,10 @@ import jpdftweak.gui.TableComponent;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfObject;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfObject;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class InteractionTab extends Tab {
 	private JCheckBox[] optionalPrefCheck = new JCheckBox[ViewerPreference.SUPPORTED_VIEWER_PREFERENCES.length];

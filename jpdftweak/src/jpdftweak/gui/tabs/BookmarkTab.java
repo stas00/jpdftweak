@@ -28,7 +28,7 @@ import jpdftweak.gui.TableComponent;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 public class BookmarkTab extends Tab {
 

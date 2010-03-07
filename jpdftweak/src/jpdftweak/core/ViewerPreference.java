@@ -1,9 +1,9 @@
 package jpdftweak.core;
 
-import com.lowagie.text.pdf.PdfBoolean;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfNumber;
-import com.lowagie.text.pdf.PdfObject;
+import com.itextpdf.text.pdf.PdfBoolean;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfNumber;
+import com.itextpdf.text.pdf.PdfObject;
 
 public class ViewerPreference {
 	

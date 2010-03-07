@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfPageLabels;
-import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfPageLabels;
+import com.itextpdf.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 
 public class PageNumberOption implements CommandOption {
 

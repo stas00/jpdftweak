@@ -11,10 +11,10 @@ import jpdftweak.core.PdfBookmark;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfPageLabels;
-import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPageLabels;
+import com.itextpdf.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 
 public class InfoOption implements CommandOption {
 
