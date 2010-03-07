@@ -17,7 +17,7 @@ import jpdftweak.gui.MainForm;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 public class OutputTab extends Tab {
 

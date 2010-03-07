@@ -14,7 +14,7 @@ import javax.swing.JList;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
 
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 public class AttachmentTab extends Tab {
 

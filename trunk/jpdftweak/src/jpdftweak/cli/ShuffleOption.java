@@ -6,7 +6,7 @@ import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.core.ShuffleRule;
 
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 public class ShuffleOption implements CommandOption {
 

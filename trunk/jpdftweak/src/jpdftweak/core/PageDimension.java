@@ -1,7 +1,7 @@
 package jpdftweak.core;
 
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Rectangle;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Rectangle;
 
 public class PageDimension {
 

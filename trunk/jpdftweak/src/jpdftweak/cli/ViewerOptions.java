@@ -9,10 +9,10 @@ import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.core.ViewerPreference;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfObject;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfObject;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class ViewerOptions implements CommandOption {
 

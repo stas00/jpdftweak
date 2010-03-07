@@ -21,7 +21,7 @@ import jpdftweak.gui.MainForm;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class EncryptSignTab extends Tab {
 

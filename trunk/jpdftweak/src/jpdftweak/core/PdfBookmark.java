@@ -71,7 +71,7 @@ public class PdfBookmark {
 		return pagePosition;
 	}
 
-	protected HashMap toBookmark(List<HashMap> kids) {
+	protected HashMap<String,Object> toBookmark(List<HashMap<String,Object>> kids) {
 		HashMap<String,Object> result = new HashMap<String,Object>();
 		result.putAll(parseString(moreOptions));
 		if (kids != null) {
@@ -94,19 +94,19 @@ public class PdfBookmark {
 		return new PdfBookmark(depth, title, open, page+offset, pagePosition, bold, italic, moreOptions);
 	}
 	
-	protected static List<HashMap> makeBookmarks(PdfBookmark[] pdfBookmarks) throws IOException {
+	protected static List<HashMap<String,Object>> makeBookmarks(PdfBookmark[] pdfBookmarks) throws IOException {
 		return makeBookmarks(pdfBookmarks, 1, 0, pdfBookmarks.length);
 	}
 	
-	protected static List<HashMap> makeBookmarks(PdfBookmark[] pdfBookmarks, int depth, int from, int to) throws IOException {
-		List<HashMap> result = new ArrayList<HashMap>();
+	protected static List<HashMap<String,Object>> makeBookmarks(PdfBookmark[] pdfBookmarks, int depth, int from, int to) throws IOException {
+		List<HashMap<String,Object>> result = new ArrayList<HashMap<String,Object>>();
 		int pos = from;
 		while (pos < to) {
 			PdfBookmark b = pdfBookmarks[pos];
 			if (b.getDepth() != depth) throw new IOException("Invalid depth value");
 			int endPos = pos+1;
 			while(endPos < to && pdfBookmarks[endPos].depth>depth) endPos++;
-			List<HashMap> kids = null;
+			List<HashMap<String,Object>> kids = null;
 			if (endPos > pos+1) {
 				kids = makeBookmarks(pdfBookmarks, depth+1, pos+1, endPos);
 			}

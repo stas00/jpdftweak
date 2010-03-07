@@ -26,8 +26,8 @@ import jpdftweak.gui.TableComponent;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.exceptions.BadPasswordException;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.exceptions.BadPasswordException;
 
 public class InputTab extends Tab {
 

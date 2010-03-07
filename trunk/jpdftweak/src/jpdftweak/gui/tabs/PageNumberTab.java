@@ -16,8 +16,8 @@ import jpdftweak.gui.TableComponent;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfPageLabels.PdfPageLabelFormat;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 
 public class PageNumberTab extends Tab {
 
