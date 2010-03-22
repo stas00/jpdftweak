@@ -44,8 +44,10 @@ import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfTransition;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.RandomAccessFileOrArray;
+import com.itextpdf.text.pdf.SimpleBookmark;
 import com.itextpdf.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 import com.itextpdf.text.pdf.interfaces.PdfEncryptionSettings;
+import com.itextpdf.text.pdf.internal.PdfViewerPreferencesImp;
 
 public class PdfTweak {
 
@@ -265,6 +267,8 @@ public class PdfTweak {
 			if (form != null) {
 				copy.copyAcroForm(currentReader);
 			}
+			copy.setOutlines(SimpleBookmark.getBookmark(currentReader));
+			PdfViewerPreferencesImp.getViewerPreferences(currentReader.getCatalog()).addToCatalog(copy.getExtraCatalog());
 			document.close();
 			copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 		}
