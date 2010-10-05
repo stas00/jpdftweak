@@ -25,6 +25,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PRAcroForm;
+import com.itextpdf.text.pdf.PRStream;
 import com.itextpdf.text.pdf.PdfAnnotation;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfCopy;
@@ -158,10 +159,19 @@ public class PdfTweak {
 		if (form != null) {
 			copy.copyAcroForm(firstReader);
 		}
+		copyXMPMetadata(firstReader, copy);
 		document.close();
 		copyInformation(firstReader, currentReader = getTempPdfReader(baos));
 	}
 	
+	private void copyXMPMetadata(PdfReader reader, PdfWriter writer) throws IOException {
+		PdfObject xmpObject = PdfReader.getPdfObject(reader.getCatalog().get(PdfName.METADATA));
+		if (xmpObject != null && xmpObject.isStream()) {
+			byte[] xmpMetadata = PdfReader.getStreamBytesRaw((PRStream)xmpObject);
+			writer.setXmpMetadata(xmpMetadata);
+		}
+	}
+
 	private OutputStream createTempOutputStream() throws IOException {
 		if (tempfile1 != null) {
 			File swap = tempfile1;
@@ -215,6 +225,8 @@ public class PdfTweak {
 				}
 			}
 		}	
+		// remove XMP metadata
+		currentReader.getCatalog().remove(PdfName.METADATA);
 	}
 	
 	private void copyInformation(PdfReader source, PdfReader destination) 
@@ -269,6 +281,7 @@ public class PdfTweak {
 			}
 			copy.setOutlines(SimpleBookmark.getBookmark(currentReader));
 			PdfViewerPreferencesImp.getViewerPreferences(currentReader.getCatalog()).addToCatalog(copy.getExtraCatalog());
+			copyXMPMetadata(currentReader, copy);
 			document.close();
 			copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 		}
@@ -443,6 +456,7 @@ public class PdfTweak {
 				}
 			}
 		}
+		copyXMPMetadata(currentReader, writer);
 		document.close();
 		copyInformation(currentReader, currentReader = getTempPdfReader(baos));	
 	}
@@ -502,6 +516,7 @@ public class PdfTweak {
 				}
 			}
 		}
+		copyXMPMetadata(currentReader, writer);
 		document.close();
 		copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 	}
@@ -635,6 +650,7 @@ public class PdfTweak {
 				}
 			}
 		}
+		copyXMPMetadata(currentReader, writer);
 		document.close();
 		copyInformation(currentReader, currentReader = getTempPdfReader(baos));	
 	}
@@ -805,6 +821,7 @@ public class PdfTweak {
 			copy.copyAcroForm(currentReader);
 		}
 		copy.setPageLabels(lbls);
+		copyXMPMetadata(currentReader, copy);
 		document.close();
 		copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 	}
