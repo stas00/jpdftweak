@@ -114,34 +114,44 @@ public class InputTab extends Tab {
 
 	protected void selectFile() {
 		JFileChooser pdfChooser = mf.getPdfChooser();
+		if (multiFiles.isSelected() || batchProcessing.isSelected()) {
+			pdfChooser.setMultiSelectionEnabled(true);
+		}
 		if (pdfChooser.showOpenDialog(mf) != JFileChooser.APPROVE_OPTION) {
+			pdfChooser.setMultiSelectionEnabled(false);
 			return;
 		}
-		File file = pdfChooser.getSelectedFile();
-		PdfInputFile f;
-		try {
+		File[] files = new File[] {pdfChooser.getSelectedFile()};
+		if (multiFiles.isSelected() || batchProcessing.isSelected()) {
+			files = pdfChooser.getSelectedFiles();
+			pdfChooser.setMultiSelectionEnabled(false);
+		}
+		for(File file : files) {
+			PdfInputFile f;
 			try {
-				f = new PdfInputFile(file, "");
-			} catch (BadPasswordException ex) {
 				try {
-					char[] pwd = PasswordInputBox.askForPassword(mf);
-					if (pwd == null) return;
-					String password = new String(pwd);
-					f = new PdfInputFile(file, password);
-				} catch (BadPasswordException ex2) {
-					JOptionPane.showMessageDialog(mf, "Bad owner password", "Cannot open input file", JOptionPane.WARNING_MESSAGE);
-					return;
+					f = new PdfInputFile(file, "");
+				} catch (BadPasswordException ex) {
+					try {
+						char[] pwd = PasswordInputBox.askForPassword(mf);
+						if (pwd == null) break;
+						String password = new String(pwd);
+						f = new PdfInputFile(file, password);
+					} catch (BadPasswordException ex2) {
+						JOptionPane.showMessageDialog(mf, "Bad owner password", "Cannot open input file", JOptionPane.WARNING_MESSAGE);
+						break;
+					}
 				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				JOptionPane.showMessageDialog(mf, ex.getMessage(), "Error reading input file", JOptionPane.ERROR_MESSAGE );
+				return;
 			}
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			JOptionPane.showMessageDialog(mf, ex.getMessage(), "Error reading input file", JOptionPane.ERROR_MESSAGE );
-			return;
+			inputFiles.add(f);
+			if (inputFiles.size() == 1) mf.setInputFile(f);
+			filesCombo.addItem(f);
+			fileCombination.addRow(f, 1, f.getPageCount(), true, true);
 		}
-		inputFiles.add(f);
-		if (inputFiles.size() == 1) mf.setInputFile(f);
-		filesCombo.addItem(f);
-		fileCombination.addRow(f, 1, f.getPageCount(), true, true);
 		if (!multiFiles.isSelected() && !batchProcessing.isSelected() && inputFiles.size() > 0)
 			selectfile.setEnabled(false);
 		if (inputFiles.size()>1) {
