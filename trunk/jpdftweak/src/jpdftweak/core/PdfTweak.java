@@ -264,7 +264,7 @@ public class PdfTweak {
 		}
 	}
 
-	public void writeOutput(String outputFile, boolean burst, boolean uncompressed, boolean sizeOptimize) throws IOException, DocumentException {
+	public void writeOutput(String outputFile, boolean burst, boolean uncompressed, boolean sizeOptimize, boolean fullyCompressed) throws IOException, DocumentException {
 		if (sizeOptimize) {
 			Document document = new Document(currentReader.getPageSizeWithRotation(1));
 			OutputStream baos = createTempOutputStream();
@@ -318,6 +318,8 @@ public class PdfTweak {
 					PdfCopy copy = new PdfCopy(document,
 							new FileOutputStream(prefix+pagenum+suffix));
 					setEncryptionSettings(copy);
+					if (fullyCompressed)
+						copy.setFullCompression();
 					document.open();
 					PdfImportedPage page;
 					page = copy.getImportedPage(currentReader, pagenum);
@@ -341,6 +343,8 @@ public class PdfTweak {
 					stamper = new PdfStamper(currentReader, new FileOutputStream(outputFile));
 				}
 				setEncryptionSettings(stamper);
+				if (fullyCompressed)
+					stamper.setFullCompression();
 				for (int i = 1; i <= total; i++) {
 					currentReader.setPageContent(i, currentReader.getPageContent(i));
 				}

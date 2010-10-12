@@ -41,12 +41,12 @@ public class CommandLineInterface {
 		List<PdfPageRange> pageRanges = new ArrayList<PdfPageRange>();
 		Map<String,PdfInputFile> aliases = new HashMap<String, PdfInputFile>();
 		String output = null;
-		boolean burstOutput = false, uncompressedOutput=false, markedOutput = false, sizeOptimize = false;
+		boolean burstOutput = false, uncompressedOutput=false, markedOutput = false, sizeOptimize = false, fullyCompress = false;
 		String password = "";
 		boolean useTempFiles = false;
 		
 		Pattern inputOption = Pattern.compile("-i((~?[0-9]+)(-(~?[0-9]+)?)?)?([eo]?)");
-		Pattern outputOption = Pattern.compile("-o[mubst]*");
+		Pattern outputOption = Pattern.compile("-o[mubstc]*");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-help") || args[i].equals("-?") || args[i].equals("/?")) {
 				if (i == args.length-1) {
@@ -95,6 +95,7 @@ public class CommandLineInterface {
 					burstOutput = args[i].contains("b");
 					useTempFiles = args[i].contains("t");
 					sizeOptimize = args[i].contains("s");
+					fullyCompress = args[i].contains("c");
 				} else {
 					boolean handled = false;
 					for (CommandOption option : options) {
@@ -155,7 +156,7 @@ public class CommandLineInterface {
 					else
 						tweak.removePageMarks();
 				}
-				tweak.writeOutput(output, burstOutput, uncompressedOutput, sizeOptimize);
+				tweak.writeOutput(output, burstOutput, uncompressedOutput, sizeOptimize, fullyCompress);
 				System.err.println("Output file written successfully.");
 			}
 		} finally {
@@ -224,7 +225,8 @@ public class CommandLineInterface {
 					"~~~~~~~~~~~~\n"+
 					"Use -o to specify the output filename; you can add flags:\n"+
 					"  -ou  save uncompressed, -om add Pdfmarks, -ob burst pages,\n"+
-					"  -ot  use temp files,  -os optimize for size. \n"+
+					"  -ot  use temp files,  -os optimize for size,\n"+
+					"  -oc use better compression (Acrobat 6.0). \n"+
 					"Flags can be combined like -oub.");	
 		} else {
 			System.out.println();

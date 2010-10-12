@@ -22,11 +22,11 @@ import com.itextpdf.text.DocumentException;
 public class OutputTab extends Tab {
 
 	private JTextField outputFile; 
-	private JCheckBox burst, uncompressed, pageMarks, tempfiles, optimizeSize;
+	private JCheckBox burst, uncompressed, pageMarks, tempfiles, optimizeSize, fullyCompressed;
 	private final MainForm mainForm;
 
 	public OutputTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		this.mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		this.add(new JLabel("Filename:"), cc.xy(1,1));
@@ -61,12 +61,13 @@ public class OutputTab extends Tab {
 		});
 		this.add(tempfiles = new JCheckBox("Use temporary files for intermediary results (saves RAM)"), cc.xyw(1,5,3));
 		this.add(optimizeSize = new JCheckBox("Optimize PDF size (will need a lot of RAM)"), cc.xyw(1,6,3));
+		this.add(fullyCompressed = new JCheckBox("Use better compression (Acrobat 6.0)"), cc.xyw(1,7,3));
 		this.add(new JLabel("<html>You can use the following variables in the output filename:<br>" +
 				"<tt>&lt;F></tt>: Input filename without extension<br>"+
 				"<tt>&lt;FX></tt>: Input filename with extension<br>" +
 				"<tt>&lt;P></tt>: Input file path without filename<br>" +
 				"<tt>&lt;#></tt>: Next free number (where file does not exist)<br>" +
-				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,7,3));
+				"<tt>*</tt> Page number (for bursting pages)"), cc.xyw(1,8,3));
 	}
 
 	@Override
@@ -90,7 +91,7 @@ public class OutputTab extends Tab {
 				tweak.removePageMarks();
 			}
 		}
-		tweak.writeOutput(outputFile.getText(), burst.isSelected(), uncompressed.isSelected(), optimizeSize.isSelected());
+		tweak.writeOutput(outputFile.getText(), burst.isSelected(), uncompressed.isSelected(), optimizeSize.isSelected(), fullyCompressed.isSelected());
 		return null;
 	}
 }
