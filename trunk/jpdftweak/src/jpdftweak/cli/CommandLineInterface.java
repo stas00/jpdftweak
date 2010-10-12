@@ -46,7 +46,7 @@ public class CommandLineInterface {
 		boolean useTempFiles = false;
 		
 		Pattern inputOption = Pattern.compile("-i((~?[0-9]+)(-(~?[0-9]+)?)?)?([eo]?)");
-		Pattern outputOption = Pattern.compile("-o[mubs]*");
+		Pattern outputOption = Pattern.compile("-o[mubst]*");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-help") || args[i].equals("-?") || args[i].equals("/?")) {
 				if (i == args.length-1) {
