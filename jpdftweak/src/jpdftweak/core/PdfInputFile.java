@@ -81,23 +81,7 @@ public class PdfInputFile {
 	}
 
 	public Map<String, String> getInfoDictionary() {
-		Map<String, String> result = new HashMap<String, String>();
-		PdfDictionary trailer = rdr.getTrailer();
-		if (trailer != null && trailer.isDictionary()) {
-			PdfObject info = PdfReader.getPdfObject(trailer.get(PdfName.INFO));
-			if (info != null && info.isDictionary()) {
-				PdfDictionary infoDic = (PdfDictionary) info;
-				for (Object key_ : infoDic.getKeys()) {
-					PdfName key = (PdfName) key_;
-					String value = infoDic.get(key).toString();
-					if (infoDic.get(key) instanceof PdfString) {
-						PdfString s = (PdfString) infoDic.get(key);
-						value = s.toUnicodeString();						
-					}
-					result.put(key.toString().substring(1), value);
-				}
-			}
-		}
+		Map<String, String> result = rdr.getInfo();
 		if (result.containsKey("Producer") && result.get("Producer").indexOf(Document.getProduct()) == -1) {
 			result.put("Producer", result.get("Producer") + "; modified by jPDF Tweak " + Main.VERSION + " (based on " + Document.getVersion() + ")");
 		}
