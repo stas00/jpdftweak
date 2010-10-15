@@ -10,6 +10,7 @@ public class TableComponentModel extends AbstractTableModel {
 	List<Object[]> rows = new ArrayList<Object[]>();
 	private final String[] columnNames;
 	private final Class[] columnClasses;
+	private RowListener listener;
 
 	public TableComponentModel(String[] columnNames, Class[] columnClasses) {
 		this.columnNames = columnNames;
@@ -79,9 +80,22 @@ public class TableComponentModel extends AbstractTableModel {
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		rows.get(rowIndex)[columnIndex] = aValue;
+		if (listener != null)
+			listener.rowChanged(rowIndex, columnIndex);
 	}
 
 	public Object[] getRow(int rowIndex) {
 		return rows.get(rowIndex);
+	}
+	
+	public void setRowListener(RowListener listener) {
+		this.listener = listener;
+	}
+	
+	public static interface RowListener {
+	    /**
+	     * Invoked when a value in a row changed.
+	     */
+	    public void rowChanged(int rowIndex, int columnIndex);
 	}
 }

@@ -72,6 +72,11 @@ public class PageNumberTab extends Tab {
 	}
 
 	@Override
+	public void checkRun() throws IOException {
+		pageNumberRanges.checkRun("page number");
+	}
+	
+	@Override
 	public PdfTweak run(PdfTweak tweak) throws IOException, DocumentException {
 		if (changePageNumbers.isSelected()) {
 			PdfPageLabelFormat[] fmts = new PdfPageLabelFormat[pageNumberRanges.getRowCount()];

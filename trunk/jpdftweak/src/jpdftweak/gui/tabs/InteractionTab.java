@@ -95,6 +95,11 @@ public class InteractionTab extends Tab {
 	}
 
 	@Override
+	public void checkRun() throws IOException {
+		transitions.checkRun("page transition");
+	}
+	
+	@Override
 	public PdfTweak run(PdfTweak tweak) throws IOException, DocumentException {
 		if (addTransitions.isSelected()) {
 			for (int i = 0; i < transitions.getRowCount(); i++) {
