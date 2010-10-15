@@ -15,6 +15,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import jpdftweak.core.PdfBookmark;
 import jpdftweak.core.PdfInputFile;
@@ -23,6 +24,7 @@ import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
 import jpdftweak.gui.PasswordInputBox;
 import jpdftweak.gui.TableComponent;
+import jpdftweak.gui.TableComponentModel;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -97,6 +99,49 @@ public class InputTab extends Tab {
 		fileCombination.setEnabled(false);
 		fileCombination.getTable().getColumnModel().getColumn(0).setPreferredWidth(300);
 		fileCombination.getTable().getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(filesCombo));
+		fileCombination.setRowListener(new TableComponentModel.RowListener() {
+			public void rowChanged(int rowIndex, int columnIndex) {
+				if (columnIndex < 3) {
+					Object[] row = fileCombination.getRow(rowIndex);
+					PdfInputFile ifile = (PdfInputFile)row[0];
+					int from = (Integer)row[1];
+					int to = (Integer)row[2];
+					int pages = ifile == null ? 1 : ifile.getPageCount();
+					boolean changed = false;
+					if (from > pages) {
+						row[1] = columnIndex == 0 ? 1 : pages;
+						changed = true;
+					}
+					if (from < -pages) {
+						row[1] = columnIndex == 0 ? 1 : -pages;
+						changed = true;
+					}
+					if (from == 0) {
+						row[1] = 1;
+						changed=true;
+					}
+					if (to > pages) {
+						row[2] = columnIndex == 0 ? -1 : pages;
+						changed = true;
+					}
+					if (to < -pages) {
+						row[2] = columnIndex == 0 ? -1 : -pages;
+						changed = true;
+					}
+					if (to == 0) {
+						row[2] = -1;
+						changed=true;
+					}
+					if (changed && columnIndex != 0) {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								JOptionPane.showMessageDialog(InputTab.this.mf, "Entered value out of range. Value has been adjusted.", "JPDFTweak", JOptionPane.WARNING_MESSAGE);								
+							}
+						});
+					}
+				}
+			}
+		});
 		updateFileName();
 	}
 
@@ -175,6 +220,13 @@ public class InputTab extends Tab {
 		fileCombination.checkRun("input file");
 		if (inputFiles.size() == 0) 
 			throw new IOException("No input file selected");
+		if (multiFiles.isSelected()) {
+			for(PdfPageRange range : getPageRanges()) {
+				if (range.getPages().length == 0) {
+					throw new IOException("At least one input file page range contains no pages");
+				}
+			}
+		}
 	}
 
 	@Override
@@ -186,17 +238,7 @@ public class InputTab extends Tab {
 			for (PdfInputFile f : inputFiles) {
 				f.reopen();
 			}
-			List<PdfPageRange> ranges = new ArrayList<PdfPageRange>();
-			for(int i=0; i <fileCombination.getRowCount(); i++) {
-				Object[] row = fileCombination.getRow(i);
-				if (row[0] == null) continue;
-				PdfInputFile ifile = (PdfInputFile)row[0];
-				int from = (Integer)row[1];
-				int to = (Integer)row[2];
-				boolean odd = (Boolean)row[3];
-				boolean even = (Boolean)row[4];
-				ranges.add(new PdfPageRange(ifile, from, to, odd, even));
-			}
+			List<PdfPageRange> ranges = getPageRanges();
 			 return new PdfTweak(inputFiles.get(0), ranges, useTempFiles);
 		} else {
 			inputFiles.get(0).reopen();
@@ -208,21 +250,26 @@ public class InputTab extends Tab {
 		if (inputFiles.size() == 0) 
 			return new ArrayList<PdfBookmark>();
 		if (multiFiles.isSelected()) {
-			List<PdfPageRange> ranges = new ArrayList<PdfPageRange>();
-			for(int i=0; i <fileCombination.getRowCount(); i++) {
-				Object[] row = fileCombination.getRow(i);
-				if (row[0] == null) continue;
-				PdfInputFile ifile = (PdfInputFile)row[0];
-				int from = (Integer)row[1];
-				int to = (Integer)row[2];
-				boolean odd = (Boolean)row[3];
-				boolean even = (Boolean)row[4];
-				ranges.add(new PdfPageRange(ifile, from, to, odd, even));
-			}
+			List<PdfPageRange> ranges = getPageRanges();
 			return PdfBookmark.buildBookmarks(ranges);			
 		} else {
 			return inputFiles.get(0).getBookmarks(1);
 		}
+	}
+
+	private List<PdfPageRange> getPageRanges() {
+		List<PdfPageRange> ranges = new ArrayList<PdfPageRange>();
+		for(int i=0; i <fileCombination.getRowCount(); i++) {
+			Object[] row = fileCombination.getRow(i);
+			if (row[0] == null) continue;
+			PdfInputFile ifile = (PdfInputFile)row[0];
+			int from = (Integer)row[1];
+			int to = (Integer)row[2];
+			boolean odd = (Boolean)row[3];
+			boolean even = (Boolean)row[4];
+			ranges.add(new PdfPageRange(ifile, from, to, odd, even));
+		}
+		return ranges;
 	}
 
 	public int getBatchLength() {
