@@ -172,6 +172,7 @@ public class InputTab extends Tab {
 
 	@Override
 	public void checkRun() throws IOException {
+		fileCombination.checkRun("input file");
 		if (inputFiles.size() == 0) 
 			throw new IOException("No input file selected");
 	}

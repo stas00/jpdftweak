@@ -211,6 +211,11 @@ public class ShuffleTab extends Tab {
 	}
 
 	@Override
+	public void checkRun() throws IOException {
+		shuffleRulesTable.checkRun("shuffle rule");
+	}
+	
+	@Override
 	public PdfTweak run(PdfTweak tweak) throws IOException, DocumentException {
 		if (shufflePages.isSelected()) {
 			tweak.shufflePages(shufflePagesPerPass, shuffleRules);

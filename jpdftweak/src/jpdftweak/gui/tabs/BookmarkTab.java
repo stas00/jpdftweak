@@ -171,6 +171,11 @@ public class BookmarkTab extends Tab {
 	public String getTabName() {
 		return "Bookmarks";
 	}
+	
+	@Override
+	public void checkRun() throws IOException {
+		bookmarks.checkRun("chapter bookmarks");
+	}
 
 	@Override
 	public PdfTweak run(PdfTweak tweak) throws IOException, DocumentException {
