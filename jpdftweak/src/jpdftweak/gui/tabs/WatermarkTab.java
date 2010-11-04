@@ -1,6 +1,7 @@
 package jpdftweak.gui.tabs;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -15,22 +16,24 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-import com.itextpdf.text.DocumentException;
-
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
+import jpdftweak.gui.TableComponent;
+
+import com.itextpdf.text.DocumentException;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class WatermarkTab extends Tab {
 
 	private MainForm mainForm;
-	private JCheckBox pdfWatermark, textWatermark, pageNumbers, watermarkUseColor, useMask;
+	private JCheckBox pdfWatermark, textWatermark, pageNumbers, watermarkUseColor, useMask, differentPageNumbers;
 	private JTextField filename, pgnoSize, pgnoHOffset, pgnoVOffset, maskText;
 	private JTextField watermarkText, watermarkSize, watermarkOpacity;
 	private JComboBox pgnoHRef, pgnoVRef;
-	private JButton fileButton, watermarkColor;
+	private JButton fileButton, watermarkColor, load;
+	private TableComponent pageNumberRanges;
 	
 	public WatermarkTab(MainForm mf) {
 		super(new FormLayout("f:p, f:p:g, 80dlu, f:p", "f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
@@ -78,11 +81,12 @@ public class WatermarkTab extends Tab {
 		});
 		add(new JSeparator(), cc.xyw(1, 9, 4));	
 		add(pageNumbers = new JCheckBox("Add page numbers"), cc.xyw(1, 10, 4));	
-		pageNumbers.addActionListener(new ActionListener() {
+		ActionListener pageNumberListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				updatePageNumbersEnabled();
 			}
-		});
+		};
+		pageNumbers.addActionListener(pageNumberListener);
 		add(new JLabel("Font size:"), cc.xy(1, 11));
 		add(pgnoSize = new JTextField("10"), cc.xyw(2, 11, 3));
 		add(new JLabel("Horizontal:"), cc.xy(1, 12));
@@ -92,12 +96,14 @@ public class WatermarkTab extends Tab {
 		add(pgnoVOffset = new JTextField("25"), cc.xy(2, 13));
 		add(pgnoVRef = new JComboBox(new String[] {"PS points from bottom margin", "PS points from center", "PS points from top margin"}), cc.xyw(3, 13, 2));
 		add(useMask = new JCheckBox("Mask: "), cc.xy(1, 14));	
-		useMask.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				updatePageNumbersEnabled();
-			}
-		});
+		useMask.addActionListener(pageNumberListener);
 		add(maskText = new JTextField("Page %d of %d"), cc.xyw(2, 14, 3));
+		add(differentPageNumbers = new JCheckBox("Use different page numbers"), cc.xyw(1, 15, 2));	
+		differentPageNumbers.addActionListener(pageNumberListener);
+		add(load = new JButton("Load from document"), cc.xyw(3, 15, 2));
+		add(pageNumberRanges = PageNumberTab.buildPageNumberRanges(), cc.xyw(1, 16, 4));
+		load.addActionListener(new PageNumberTab.PageNumberLoadAction(mf, pageNumberRanges));
+		pageNumberRanges.getScrollPane().setPreferredSize(new Dimension(750, 100));
 		updatePDFWatermarkEnabled();
 		updateTextWatermarkEnabled();
 		updatePageNumbersEnabled();
@@ -124,6 +130,9 @@ public class WatermarkTab extends Tab {
 		pgnoVRef.setEnabled(pageNumbers.isSelected());
 		useMask.setEnabled(pageNumbers.isSelected());
 		maskText.setEnabled(pageNumbers.isSelected() && useMask.isSelected());
+		differentPageNumbers.setEnabled(pageNumbers.isSelected());
+		load.setEnabled(pageNumbers.isSelected() && differentPageNumbers.isSelected());
+		pageNumberRanges.setEnabled(pageNumbers.isSelected() && differentPageNumbers.isSelected());
 	}
 	
 	@Override
@@ -152,6 +161,9 @@ public class WatermarkTab extends Tab {
 				wmOpacity = Float.parseFloat(watermarkOpacity.getText());
 			}
 			if (pageNumbers.isSelected()) {
+				if (differentPageNumbers.isSelected()) {
+					PageNumberTab.updatePageNumberRanges(tweak, pageNumberRanges);
+				}
 				run=true;
 				pnPosition = pgnoVRef.getSelectedIndex()*3+pgnoHRef.getSelectedIndex();
 				pnSize = Integer.parseInt(pgnoSize.getText());
