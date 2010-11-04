@@ -687,7 +687,7 @@ public class PdfTweak {
 		currentReader = getTempPdfReader(baos);
 	}
 
-	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, Color wmColor, int pnPosition, int pnSize, float pnHOff, float pnVOff, String mask) throws DocumentException, IOException {
+	public void addWatermark(PdfInputFile wmFile, String wmText, int wmSize, float wmOpacity, Color wmColor, int pnPosition, boolean pnFlipEven, int pnSize, float pnHOff, float pnVOff, String mask) throws DocumentException, IOException {
 		OutputStream baos = createTempOutputStream();  
 		int pagecount = currentReader.getNumberOfPages();
 		PdfGState gs1 = new PdfGState();
@@ -747,7 +747,10 @@ public class PdfTweak {
 			if (pnPosition != -1) {
 				overContent.beginText();
 				overContent.setFontAndSize(bf, pnSize);
-				float xx = pnHOff * ((pnPosition % 3 == 2) ? -1 : 1) + size.getWidth() * (pnPosition % 3) / 2.0f;
+				int pnXPosition = pnPosition % 3;
+				if (pnFlipEven && i % 2 == 0)
+					pnXPosition = 2 - pnXPosition;
+				float xx = pnHOff * ((pnXPosition == 2) ? -1 : 1) + size.getWidth() * pnXPosition / 2.0f;
 				float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.getHeight() * (pnPosition / 3) / 2.0f;
 				String number = "" + i;
 				if (mask != null && mask.length() > 0) {

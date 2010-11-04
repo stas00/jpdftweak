@@ -91,7 +91,7 @@ public class WatermarkTab extends Tab {
 		add(pgnoSize = new JTextField("10"), cc.xyw(2, 11, 3));
 		add(new JLabel("Horizontal:"), cc.xy(1, 12));
 		add(pgnoHOffset = new JTextField("25"), cc.xy(2, 12));
-		add(pgnoHRef = new JComboBox(new String[] {"PS points from left margin", "PS points from center", "PS points from right margin"}), cc.xyw(3, 12, 2));
+		add(pgnoHRef = new JComboBox(new String[] {"PS points from left margin", "PS points from center", "PS points from right margin", "PS points from inner margin", "PS points from outer margin"}), cc.xyw(3, 12, 2));
 		add(new JLabel("Vertical:"), cc.xy(1, 13));
 		add(pgnoVOffset = new JTextField("25"), cc.xy(2, 13));
 		add(pgnoVRef = new JComboBox(new String[] {"PS points from bottom margin", "PS points from center", "PS points from top margin"}), cc.xyw(3, 13, 2));
@@ -146,6 +146,7 @@ public class WatermarkTab extends Tab {
 		PdfInputFile wmFile = null;
 		String wmText = null;
 		int wmSize=0, pnSize=0, pnPosition=-1;
+		boolean pnFlipEven = false;
 		float wmOpacity=0, pnHOff=0, pnVOff=0;
 		Color wmColor = null;
 		String mask = null;
@@ -165,7 +166,12 @@ public class WatermarkTab extends Tab {
 					PageNumberTab.updatePageNumberRanges(tweak, pageNumberRanges);
 				}
 				run=true;
-				pnPosition = pgnoVRef.getSelectedIndex()*3+pgnoHRef.getSelectedIndex();
+				int hIndex = pgnoHRef.getSelectedIndex();
+				if (hIndex > 2) {
+					hIndex = hIndex * 2 - 6;
+					pnFlipEven = true;
+				}
+				pnPosition = pgnoVRef.getSelectedIndex()*3+hIndex;
 				pnSize = Integer.parseInt(pgnoSize.getText());
 				pnHOff = Float.parseFloat(pgnoHOffset.getText());
 				pnVOff = Float.parseFloat(pgnoVOffset.getText());
@@ -180,7 +186,7 @@ public class WatermarkTab extends Tab {
 			throw new IOException("Unparsable value: "+ex.getMessage());
 		}
 		if (run) {
-			tweak.addWatermark(wmFile, wmText, wmSize, wmOpacity, wmColor, pnPosition, pnSize, pnHOff, pnVOff, mask);
+			tweak.addWatermark(wmFile, wmText, wmSize, wmOpacity, wmColor, pnPosition, pnFlipEven, pnSize, pnHOff, pnVOff, mask);
 		}
 		if (wmFile != null)
 			wmFile.close();

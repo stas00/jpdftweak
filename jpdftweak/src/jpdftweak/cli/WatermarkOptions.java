@@ -22,6 +22,7 @@ public class WatermarkOptions implements CommandOption {
 	private Color textcolor;
 	
 	private int position = -1;
+	private boolean flipEven = false;
 	private int nsize;
 	private float xoff, yoff;
 	private String mask;
@@ -50,7 +51,7 @@ public class WatermarkOptions implements CommandOption {
 			}
 		}
 		if (option.equals("-numbers")) {
-			Matcher m = Pattern.compile("([LRTBC]|[LR][TB]),([0-9]+),(-?[0-9]+),(-?[0-9]+)(,.+)?").matcher(value);
+			Matcher m = Pattern.compile("([LRIOTBC]|[LRIO][TB]),([0-9]+),(-?[0-9]+),(-?[0-9]+)(,.+)?").matcher(value);
 			if (!m.matches()) {
 				System.err.println("Error: Invalid parameter for -numbers option");
 				return false;	
@@ -60,6 +61,14 @@ public class WatermarkOptions implements CommandOption {
 					"L", "C", "R",
 					"LT", "T", "RT"
 			}).indexOf(m.group(1));
+			if (position == -1) {
+				position = Arrays.asList(new String[] {
+						"IB", "B", "OB",
+						"I", "C", "O",
+						"IT", "T", "OT"
+				}).indexOf(m.group(1));
+				flipEven = true;
+			}
 			if (position == -1) {
 				throw new RuntimeException(m.group(1));
 			}
@@ -75,7 +84,7 @@ public class WatermarkOptions implements CommandOption {
 			throws IOException, DocumentException {
 		if (background != null || text != null || position != -1) {
 			tweak.addWatermark(background == null ? null : new PdfInputFile(new File(background),""), 
-					text, textsize, textopacity, textcolor, position, nsize, xoff, yoff, mask);
+					text, textsize, textopacity, textcolor, position, flipEven, nsize, xoff, yoff, mask);
 		}		
 	}
 	
@@ -105,12 +114,18 @@ public class WatermarkOptions implements CommandOption {
 				"    points. {POSITION} may be one of:\n\n" +
 				"        L left edge\n" +
 				"        R right edge\n" +
+				"        I inner edge\n" +
+				"        O outer edge\n" +
 				"        T top edge\n" +
 				"        B bottom edge\n" +
 				"        LB left bottom corner\n" +
 				"        RB right bottom corner\n" +
+				"        IB inner bottom corner\n" +
+				"        OB outer bottom corner\n" +
 				"        LT left top corner\n" +
 				"        RT right top corner\n" +
+				"        IT inner top corner\n" +
+				"        OT outer top corner\n" +
 				"        C center of page";
 		}
 		throw new RuntimeException();
