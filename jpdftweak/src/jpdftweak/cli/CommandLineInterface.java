@@ -19,22 +19,7 @@ import jpdftweak.core.PdfTweak;
 
 public class CommandLineInterface {
 
-	private CommandOption[] options = {
-			new PreserveHyperlinksOption(),
-			new RotateOption(),
-			new ScaleOption(),
-			new WatermarkOptions(),
-			new ShuffleOption(),
-			new PageNumberOption(),
-			new BookmarksOption(),
-			new AttachOption(),
-			new TransitionOption(),
-			new ViewerOptions(),
-			new DocInfoOption(),
-			new EncryptOptions(),
-			new SignOptions(),
-			new InfoOption()
-	};
+	private List<CommandOption[]> options = new ArrayList<CommandOption[]>();
 	
 	public CommandLineInterface(String[] args) throws IOException, DocumentException {
 		PdfInputFile input = null;
@@ -58,6 +43,8 @@ public class CommandLineInterface {
 			} else if (args[i].equals("-v") || args[i].equals("-version")) {
 				System.out.println("JPDF Tweak " + Main.VERSION);
 				return;
+			} else if (args[i].equals("--")) {
+				options.add(buildOptions());
 			} else if (args[i].startsWith("-")) {
 				if (i == args.length-1) {
 					System.err.println("Option without parameters: "+args[i]);
@@ -97,8 +84,10 @@ public class CommandLineInterface {
 					sizeOptimize = args[i].contains("s");
 					fullyCompress = args[i].contains("c");
 				} else {
+					if (options.size() == 0)
+						options.add(buildOptions());
 					boolean handled = false;
-					for (CommandOption option : options) {
+					for (CommandOption option : options.get(options.size() - 1)) {
 						if (option.supportsOption(args[i])) {
 							if(!option.setOption(args[i], args[i+1])) return;
 							handled = true;
@@ -144,8 +133,10 @@ public class CommandLineInterface {
 			tweak = new PdfTweak(input, pageRanges, useTempFiles);
 		}
 		try {
-			for (CommandOption option : options) {
-				option.run(tweak, input);
+			for (CommandOption[] optionBlock : options) {
+				for (CommandOption option : optionBlock) {
+					option.run(tweak, input);
+				}
 			}
 			if (output == null) {
 				System.err.println("Cannot write PDF: No output file.");
@@ -164,6 +155,25 @@ public class CommandLineInterface {
 		}
 	}
 
+	private CommandOption[] buildOptions() {
+		return new CommandOption[] {
+				new PreserveHyperlinksOption(),
+				new RotateOption(),
+				new ScaleOption(),
+				new WatermarkOptions(),
+				new ShuffleOption(),
+				new PageNumberOption(),
+				new BookmarksOption(),
+				new AttachOption(),
+				new TransitionOption(),
+				new ViewerOptions(),
+				new DocInfoOption(),
+				new EncryptOptions(),
+				new SignOptions(),
+				new InfoOption()
+		};
+	}
+
 	private void showHelp() {
 		System.out.println("jPDF Tweak "+Main.VERSION+"\n\n"+
 				"Usage: jpdftweak {inputfile} [-o[opt]] {outputfile}\n"+
@@ -175,6 +185,9 @@ public class CommandLineInterface {
 				"wildcards (like *.pdf) for the input file.\n"+
 				"You may add options and transformation and their parameter everywhere in the\n" +
 				"commandline, except between a -i/-o switch and the filename.\n" +
+				"The order of tranformations is the one printed below. To change the order\n" +
+				"or to perform a transformation more than once, separate transformation\n" +
+				"block by two dashes (--).\n" +
 				"Parameters are case sensitive.\n\n"+
 				"Parameters\n"+
 				"~~~~~~~~~~\n"+
@@ -188,7 +201,7 @@ public class CommandLineInterface {
 				"\n"+
 				"Transformations\n"+
 				"~~~~~~~~~~~~~~~");
-		for(CommandOption option: options) {
+		for(CommandOption option: buildOptions()) {
 			System.out.print(option.getSummary());
 		}		
 	}
@@ -230,7 +243,7 @@ public class CommandLineInterface {
 					"Flags can be combined like -oub.");	
 		} else {
 			System.out.println();
-			for (CommandOption o : options) {
+			for (CommandOption o : buildOptions()) {
 				if (o.supportsOption(option)) {
 					System.out.println(o.getHelp(option));
 					return;
