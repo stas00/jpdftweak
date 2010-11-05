@@ -36,7 +36,7 @@ public class WatermarkTab extends Tab {
 	private TableComponent pageNumberRanges;
 	
 	public WatermarkTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, 80dlu, f:p", "f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, 80dlu, f:p", "f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, 10dlu, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
 		mainForm = mf;
 		CellConstraints cc = new CellConstraints();
 		add(pdfWatermark = new JCheckBox("Add first page of PDF as background watermark"), cc.xyw(1, 1, 4));
@@ -97,11 +97,12 @@ public class WatermarkTab extends Tab {
 		add(pgnoVRef = new JComboBox(new String[] {"PS points from bottom margin", "PS points from center", "PS points from top margin"}), cc.xyw(3, 13, 2));
 		add(useMask = new JCheckBox("Mask: "), cc.xy(1, 14));	
 		useMask.addActionListener(pageNumberListener);
-		add(maskText = new JTextField("Page %d of %d"), cc.xyw(2, 14, 3));
-		add(differentPageNumbers = new JCheckBox("Use different page numbers"), cc.xyw(1, 15, 2));	
+		add(maskText = new JTextField("Page %1$d of %2$d"), cc.xyw(2, 14, 3));
+		add(new JLabel("<html><tt>%1$d</tt> - page index, <tt>%2$d</tt> - page count, <tt>%3$d</tt> - logical page number, <tt>%4$s</tt> page number text"), cc.xyw(2,15,3));
+		add(differentPageNumbers = new JCheckBox("Use different page numbers"), cc.xyw(1, 16, 2));	
 		differentPageNumbers.addActionListener(pageNumberListener);
-		add(load = new JButton("Load from document"), cc.xyw(3, 15, 2));
-		add(pageNumberRanges = PageNumberTab.buildPageNumberRanges(), cc.xyw(1, 16, 4));
+		add(load = new JButton("Load from document"), cc.xyw(3, 16, 2));
+		add(pageNumberRanges = PageNumberTab.buildPageNumberRanges(), cc.xyw(1, 17, 4));
 		load.addActionListener(new PageNumberTab.PageNumberLoadAction(mf, pageNumberRanges));
 		pageNumberRanges.getScrollPane().setPreferredSize(new Dimension(750, 100));
 		updatePDFWatermarkEnabled();
@@ -164,6 +165,7 @@ public class WatermarkTab extends Tab {
 			if (pageNumbers.isSelected()) {
 				if (differentPageNumbers.isSelected()) {
 					PageNumberTab.updatePageNumberRanges(tweak, pageNumberRanges);
+					mask = "%4$s";
 				}
 				run=true;
 				int hIndex = pgnoHRef.getSelectedIndex();
