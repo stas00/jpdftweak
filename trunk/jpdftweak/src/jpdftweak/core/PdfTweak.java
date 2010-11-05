@@ -697,11 +697,28 @@ public class PdfTweak {
 				false);
 		float txtwidth=0;
 		PdfImportedPage wmTemplate = null;
+		String[] pageLabels = null;
+		PdfPageLabelFormat[] pageLabelFormats = null;
 		if (wmText != null) {
 			txtwidth = bf.getWidthPoint(wmText, wmSize);
 		}
 		if (wmFile != null) {
 			wmTemplate = stamper.getImportedPage(wmFile.getReader(), 1);
+		}
+		if (mask != null && mask.length() > 0) {
+			pageLabels = PdfPageLabels.getPageLabels(currentReader);
+			if (pageLabels == null) {
+				pageLabels = new String[pagecount];
+				for (int i = 1; i <= pagecount; i++) {
+					pageLabels[i-1] = "" + i;
+				}
+			}
+			pageLabelFormats = PdfPageLabels.getPageLabelFormats(currentReader);
+			if (pageLabelFormats == null || pageLabelFormats.length == 0) {
+				pageLabelFormats = new PdfPageLabelFormat[] {
+					new PdfPageLabelFormat(1, PdfPageLabels.DECIMAL_ARABIC_NUMERALS, "", 1)
+				};
+			}
 		}
 		for (int i = 1; i <= pagecount; i++) {
 			if (wmTemplate != null) {
@@ -754,8 +771,15 @@ public class PdfTweak {
 				float yy = pnVOff * ((pnPosition / 3 == 2) ? -1 : 1) + size.getHeight() * (pnPosition / 3) / 2.0f;
 				String number = "" + i;
 				if (mask != null && mask.length() > 0) {
+					int pagenumber = i;
+					for(PdfPageLabelFormat format : pageLabelFormats) {
+						if (format.physicalPage <= i) {
+							pagenumber = i - format.physicalPage + format.logicalPage;
+						}
+					}
+					String pagenumbertext = pageLabels[i-1];
 					try {
-						number = String.format(mask, i, pagecount);
+						number = String.format(mask, i, pagecount, pagenumber, pagenumbertext);
 					} catch (IllegalFormatException ex) {
 						throw new IOException(ex.toString());
 					}
