@@ -49,7 +49,38 @@ Please send bug reports and suggestions to <schierlm@users.sourceforge.net>.
 ChangeLog
 ~~~~~~~~~
 
-+++ 2009-07-13 Released version 0.9.5
++++ 2010-11-06 Released version 1.0-rc1 +++
+
+- Formal changes
+  * As the program got quite stable, this is the first version that
+    is no longer beta but a release candidate.
+  * Update to iText 5.0.5, BouncyCastle 1.45 and JGoodies Forms 1.3
+  * Due to changes in licensing of the PDF library used by jPDF Tweak
+    (iText), the license of the current version changed to GNU Affero
+    General Public License version 3 (AGPLv3+). If you know a good reason
+    why to create a separate branch that stays GPLv2+ and uses the old
+    version of iText, write me - maybe you can convince me.
+- Support more than one transformation block at once in the command line 
+  interface
+- Add support for PDF 1.5 compression (Acrobat 6.0)
+- Enable multiselect in the file chooser for multifile and batch modes
+- Page number improvements:
+  * Add support for printing page labels either as pre-formatted logical
+    page numbers (i. e. Roman/Arabic etc.) or as custom formatted logical
+    page numbers (e. g. with leading zeroes)
+  * Add page number UI on watermark tab to change (printed) page numbers 
+    before performing shuffle rule.
+  * Add option to print page numbers on inner/outer edge (flip on 
+    even/odd pages)
+- Bug fixes:
+  * Improve validation of page ranges on the input tab
+  * Fix handling of dirty cell editors and invalid cell values
+  * Fix -ot (temp files) command line option
+  * Fix handling of XMP metadata when changing document info
+  * Preserve outlines (bookmarks), viewer preferences and page numbers
+    when optimizing for size
+
++++ 2009-07-13 Released version 0.9.5 +++
 
 - update to iText 2.1.7, BouncyCastle 1.43 and JGoodies Forms 1.2.1
 - Add option to change mask used for printing page numbers
@@ -77,7 +108,7 @@ ChangeLog
   * catch OutOfMemoryError and display an error message
 
 
-+++ 2007-09-10 Released version 0.9
++++ 2007-09-10 Released version 0.9 +++
 
 - update to iText 2.0.5
 - Preserve hyperlinks when resizing and shuffling if desired
