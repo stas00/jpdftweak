@@ -282,6 +282,14 @@ public class PdfTweak {
 			copy.setOutlines(SimpleBookmark.getBookmark(currentReader));
 			PdfViewerPreferencesImp.getViewerPreferences(currentReader.getCatalog()).addToCatalog(copy.getExtraCatalog());
 			copyXMPMetadata(currentReader, copy);
+			PdfPageLabelFormat[] formats = PdfPageLabels.getPageLabelFormats(currentReader);
+			if (formats != null) {
+				PdfPageLabels lbls = new PdfPageLabels();
+				for (PdfPageLabelFormat format : formats) {
+					lbls.addPageLabel(format);			
+				}
+				copy.setPageLabels(lbls);
+			}
 			document.close();
 			copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 		}
