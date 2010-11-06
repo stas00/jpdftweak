@@ -39,7 +39,10 @@ or running</p>
   files, check the checkbox and add more files. They will end up in
   the box below, where you can select pages and/or reorder them. Click
   Add in the lower left corner to add another entry for a file already
-  used.</p>
+  used. If you want to process multiple files the same way, select
+  batch processing and add multiple files. In that case, you should use
+  variables in the output filename or each file will overwrite the
+  previous one.</p>
 
 <p>If the file is encrypted, you will need the owner password to
   decrypt it. Yes, I know, it is <i>possible</i> to decrypt by using
@@ -95,11 +98,28 @@ or running</p>
 <p>Text watermark and page numbers use the built-in Helvetica font
   (similar to Arial on Windows systems).</p>
 
+<p>Page numbers can be printed on any corner or edge of the page,
+or in the middle (mostly useful for testing purposes). The position
+can be mirrored on even pages, to get the page number on the outer
+or inner edge for duplex documents.</p>
+
 <p>If plain numbers are not enough for you, you can use a mask to
 format your numbers. This mask uses the same syntax as the standard
 Java <a href="http://java.sun.com/j2se/1.5/docs/api/java/util/Formatter.html#syntax">formatting
 function</a>, and supports the current page number and the total
-number of pages as parameters.</p>
+number of pages as parameters. The current page number is available 
+in a plain way (1-n) that you can format yourself, and additionally
+in a shifted way (if your document's page numbers are shifted), and
+in a pre-formatted way (which is interesting for letters or roman
+numbers).</p>
+
+<p>In case you want to change the page numbers for the printed values,
+you can do this on this tab as well, in the same format as on the
+Page Numbers Tab. Note that if you do not select different page numbers
+on the Page Numbers Tab, and no other transformation invalidates your
+page numbers, these page numbers will also be present in the output
+document as if they were configured on the Page Numbers Tab as well.
+So, for this common case, it is enough to configure the page numbers once.</p>
 
 <h3>The Shuffle/N-up Tab</h3>
 <p><img src="shot04.png" width="763" height="544" alt="Shuffle/N-up Options"></p>
@@ -239,15 +259,5 @@ file.</p>
   PDF to find a page. When you compress a PDF again, you can remove
   these marks.</p>
 <hr>
-&copy; 2007 Michael Schierl
+&copy; 2007-2010 Michael Schierl
 </body></html>
-
-
-
-
-
-
-
-
-
-
