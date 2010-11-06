@@ -16,7 +16,7 @@
 
 	<target name="compile">
 		<mkdir dir="build/bin" />
-		<javac srcdir="src" destdir="build/bin" source="1.5" target="1.5">
+		<javac srcdir="src" destdir="build/bin" source="1.5" target="1.5" includeantruntime="false">
 			<classpath>
 				<pathelement path="${ITEXT}" />
 				<pathelement path="${FORMS}" />
@@ -39,27 +39,28 @@
 				<attribute name="Main-Class" value="jpdftweak.Main"/>
 			</manifest>
 		</jar>
-		<mkdir dir="build/libs"/>
-		<unjar dest="build/libs">
-			<fileset dir=".">
+		<zip destfile="build/libs1.jar">
+			<zipgroupfileset dir=".">
 				<include name="${ITEXT}"/>
 				<include name="${BCPROV}"/>
 				<include name="${BCMAIL}"/>
 				<include name="${BCTSP}"/>
 				<include name="${FORMS}"/>
-			</fileset>
-			<patternset>
+			</zipgroupfileset>
+		</zip>
+		<zip destfile = "build/libs.jar">
+			<zipfileset src="build/libs1.jar">	
 				<include name="**/*/*.class"/>
 				<exclude name="META-INF"/>
 				<exclude name="META-INF/*"/>
-				<include name="com/lowagie/text/pdf/fonts/*"/>
-				<exclude name="com/lowagie/tools/**"/>
+				<include name="com/itextpdf/text/error_messages/en.lng"/>
+				<include name="com/itextpdf/text/pdf/fonts/glyphlist.txt"/>
+				<include name="com/itextpdf/text/pdf/fonts/Helvetica*.afm"/>
 				<exclude name="org/bouncycastle/mail/**"/>
 				<exclude name="org/bouncycastle/util/IPTest.class"/>
 				<exclude name="org/bouncycastle/util/AllTests.class"/>
-			</patternset>
-		</unjar>		
-		<zip destfile="build/libs.jar" basedir="build/libs"/>
+			</zipfileset>
+		</zip>
 		<java fork="true" jar="${PROGUARD}">
 			<!-- Proguard can be very resource hungry -->
 			<jvmarg value="-Xmx128M"/>
