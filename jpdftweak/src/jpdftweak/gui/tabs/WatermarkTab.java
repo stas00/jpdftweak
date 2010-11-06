@@ -142,6 +142,11 @@ public class WatermarkTab extends Tab {
 	}
 
 	@Override
+	public void checkRun() throws IOException {
+		pageNumberRanges.checkRun("different page number");
+	}
+	
+	@Override
 	public PdfTweak run(PdfTweak tweak) throws IOException, DocumentException {
 		boolean run = false;
 		PdfInputFile wmFile = null;
