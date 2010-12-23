@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
@@ -15,13 +16,18 @@ import jpdftweak.cli.CommandLineInterface;
 import jpdftweak.gui.MainForm;
 
 public class Main {
-	public static final String VERSION = "1.0-rc1";
+	public static final String VERSION = "1.0-rc1-dev";
 
 	public static void main(String[] args) {
+		String missingLib = findMissingLibName();
 		if (args.length == 0) {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (Exception ex) {}
+			if (missingLib != null) {
+				JOptionPane.showMessageDialog(null, "The required file lib/"+missingLib+".jar could not be loaded.\nVerify that the file is present and your download was not corrupted.", "JPDFTweak", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 				public void uncaughtException(Thread t, Throwable e) {
 					e.printStackTrace();
@@ -45,11 +51,36 @@ public class Main {
 			});
 			new MainForm();
 		} else {
+			if (missingLib != null) {
+				System.out.println("The required file lib/"+missingLib+".jar could not be loaded.");
+				System.out.println("Verify that the file is present and your download was not corrupted.");
+				return;
+			}
 			try {
 				new CommandLineInterface(args);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+	private static String findMissingLibName() {
+		String result = null;
+		try {
+			result = "itext";
+			Class.forName("com.itextpdf.text.DocumentException");
+			result = "forms";
+			Class.forName("com.jgoodies.forms.layout.FormLayout");
+			result = "bcprov";
+			Class.forName("org.bouncycastle.asn1.ASN1OctetString");
+			result = "bcmail";
+			Class.forName("org.bouncycastle.cms.CMSEnvelopedData");
+			result = "bctsp";
+			Class.forName("org.bouncycastle.tsp.TSPException");
+			result = null;
+		} catch (Throwable t) {
+			// nothing to do here
+		}
+		return result;
 	}
 }

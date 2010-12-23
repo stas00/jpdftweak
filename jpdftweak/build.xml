@@ -78,9 +78,10 @@
 		</copy>
 		<copy todir="dist/nolib">
 			<fileset dir="dist/bin" excludes="lib/*.jar"/>
+			<fileset dir="." includes="lib/README"/>
 		</copy>
 		<copy todir="dist/compact">
-			<fileset dir="dist/bin" excludes="jpdftweak.jar"/>
+			<fileset dir="dist/bin" excludes="lib,lib/**,jpdftweak.jar"/>
 		</copy>
 		<copy file="jpdftweak-static.jar" tofile="dist/compact/jpdftweak.jar"/>		
 	</target>
