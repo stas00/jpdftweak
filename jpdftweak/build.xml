@@ -22,6 +22,11 @@
 				<pathelement path="${FORMS}" />
 			</classpath>
 		</javac>
+		<copy todir="build/bin">
+			<fileset dir="src">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="jar" depends="compile">
@@ -71,10 +76,10 @@
 	
 	<target name="dist" depends="jar, staticjar">
 		<copy todir="dist/src">
-			<fileset dir="." includes="build.xml,jpdftweak.bat,jpdftweak.pro,*.txt,manual/**,src/**,lib/README,lib/itext.diff"/>
+			<fileset dir="." includes="build.xml,jpdftweak.bat,jpdftweak.pro,*.txt,*.ico,icons/**,manual/**,src/**,lib/README,lib/itext.diff"/>
 		</copy>
 		<copy todir="dist/bin">
-			<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
+			<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,*.ico,icons/*.png,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
 		</copy>
 		<copy todir="dist/nolib">
 			<fileset dir="dist/bin" excludes="lib/*.jar"/>
