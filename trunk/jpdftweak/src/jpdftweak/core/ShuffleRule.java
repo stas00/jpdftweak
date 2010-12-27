@@ -22,6 +22,7 @@ public class ShuffleRule {
 	
 	public static final String[] predefinedRuleSets = new String[] {
 		"1:!+1N1+0%+0%=Default",
+		"1:!-1N1+0%+0%=Reverse Page Order",
 		"2:!+1L0.707+0%-100%,+2L.707+100%-100%=2-up Portrait",
 		"2:!+1L0.707+0%-100%,+2L.707+0%-200%=2-up Landscape",
 		"4:!+1N0.5+0%+100%,+2N0.5+100%+100%,+3N0.5+0%+0%,+4N0.5+100%+0%,=4-up",
