@@ -49,6 +49,18 @@ Please send bug reports and suggestions to <schierlm@users.sourceforge.net>.
 ChangeLog
 ~~~~~~~~~
 
++++ 2010-12-27 Released version 1.0 +++
+
+- Add shuffle rule to reverse page order
+- Add application icon contributed anonymously
+- Update manual
+- Bug fixes:
+  * Show an error when using batch processing but no output variables 
+    are used
+  * Detect missing library files and show a friendly error message
+  * include lib/README file in nolib version
+  * fix buildfile so that it does not add libraries to compact version
+
 +++ 2010-11-06 Released version 1.0-rc1 +++
 
 - Formal changes
