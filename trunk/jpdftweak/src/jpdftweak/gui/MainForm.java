@@ -1,6 +1,7 @@
 package jpdftweak.gui;
 
 import java.awt.Cursor;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -56,6 +57,7 @@ public class MainForm extends JFrame {
 	
 	public MainForm() {
 		super("jPDF Tweak "+Main.VERSION);
+		setIconImage(Toolkit.getDefaultToolkit().createImage(MainForm.class.getResource("/icon.png")));
 		pdfChooser.setFileFilter(new FileFilter() {
 			@Override
 			public String getDescription() {
