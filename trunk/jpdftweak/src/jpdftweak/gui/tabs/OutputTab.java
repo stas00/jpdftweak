@@ -79,6 +79,12 @@ public class OutputTab extends Tab {
 	public void checkRun() throws IOException {
 		if (outputFile.getText().length() == 0)
 			throw new IOException("No output file selected");  
+		String outputFileName = outputFile.getText();
+		if(mainForm.getInputTab().getBatchLength() > 1) {
+			if (!outputFileName.contains("<F>") && !outputFileName.contains("<FX>") &&!outputFileName.contains("<P>") &&!outputFileName.contains("<#>")) {
+				throw new IOException("Variables in output file name required for batch mode");
+			}
+		}
 		mainForm.getInputTab().setUseTempFiles(tempfiles.isSelected());
 	}
 	
