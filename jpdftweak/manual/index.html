@@ -51,6 +51,12 @@ or running</p>
 <p>All page numbers start with 1 (like normal people count), not with 0
   (like programmers count).</p>
 
+<p>Note that if you use the "combine multiple files" option, some options
+  that are usually kept in the document are dropped, even if you only 
+  selected one file! This also applies to the command line mode - if you
+  use the <tt>-i</tt> option, it will use multiple file mode and drop
+  page numbers, document info, forms, etc.</p> 
+
 <h3>The Page Size Tab</h3>
 <p><img src="shot02.png" width="763" height="544" alt="Page Size Options"></p>
 
@@ -175,7 +181,8 @@ you want to have "gaps" in your page numbers, add more lines and use
 "Start page" to point to the physical page numbers (i. e. those that
 start from 1) where the format should change.</p>
 
-<p>Assume you have a 6 page PDF, and you set it up as follows:
+<p>Assume you have a 6 page PDF, and you set it up as follows:</p>
+
 <table border="1" style="margin: 5px; border: 1px solid gray; border-collapse: collapse">
 <tr><th>Start Page</th><th>Style</th><th>Prefix</th><th>Logical Page</th></tr>
 <tr><td>1</td><td>Empty</td><td>Title</td><td>1</td></tr>
@@ -247,7 +254,11 @@ file.</p>
 <h3>The Output Tab</h3>
 <p><img src="shot10.png" width="763" height="544" alt="Output Options"></p>
 
-<p>Don't forget this tab! Select an output filename here.</p>
+<p>Don't forget this tab! Select an output filename here. If you 
+  select a name of an existing file, you will receive a warning.
+  However, if you run jPDF tweak more than once, it will <b>not</b>
+  create a warning since warnings are annoying if you are just trying
+  to find the right settings by trial and error.</p>
 
 <p>You may optionally burst the document into single page PDFs. Note
   that not all features (like bookmarks, transitions or viewer
