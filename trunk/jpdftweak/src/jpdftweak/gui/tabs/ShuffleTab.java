@@ -128,6 +128,7 @@ public class ShuffleTab extends Tab {
 					pb = PageBase.END; tmp = tmp.substring(1);
 				}
 				int page = Integer.parseInt(tmp);
+				if (page <= 0) throw new NumberFormatException((String)row[0]);
 				tmp = (String) row[1];
 				boolean oxp = false, oyp = false;
 				if (tmp.endsWith("%")) {
@@ -166,6 +167,9 @@ public class ShuffleTab extends Tab {
 		} catch (NumberFormatException ex) {
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(mf, "Unparsable config string: "+ex.getMessage());
+		} catch (IllegalArgumentException ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(mf, "Unparsable config string: "+configString.getText());
 		}
 	}
 	

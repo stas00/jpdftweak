@@ -45,7 +45,7 @@ public class ShuffleRule {
 	
 	public ShuffleRule(boolean newPageBefore, PageBase pageBase, int pageNumber, char rotate, double scale, double offsetX, boolean offsetXPercent, double offsetY, boolean offsetYPercent, double frameWidth) {
 		if ("NRLU".indexOf(rotate) == -1) throw new IllegalArgumentException(""+rotate);
-		if (pageNumber == 0) throw new IllegalArgumentException();
+		if (pageNumber <= 0) throw new IllegalArgumentException();
 		this.newPageBefore = newPageBefore;
 		this.pageBase = pageBase;
 		this.pageNumber = pageNumber;
