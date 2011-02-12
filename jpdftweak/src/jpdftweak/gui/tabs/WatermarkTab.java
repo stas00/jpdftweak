@@ -166,6 +166,8 @@ public class WatermarkTab extends Tab {
 				wmText = watermarkText.getText();
 				wmSize = Integer.parseInt(watermarkSize.getText());
 				wmOpacity = Float.parseFloat(watermarkOpacity.getText());
+				if (wmSize == 0)
+					throw new IOException("Font size may not be zero");
 			}
 			if (pageNumbers.isSelected()) {
 				if (differentPageNumbers.isSelected()) {
@@ -182,6 +184,8 @@ public class WatermarkTab extends Tab {
 				pnSize = Integer.parseInt(pgnoSize.getText());
 				pnHOff = Float.parseFloat(pgnoHOffset.getText());
 				pnVOff = Float.parseFloat(pgnoVOffset.getText());
+				if (pnSize == 0)
+					throw new IOException("Font size may not be zero");
 			}
 			if (watermarkUseColor.isSelected()) {
 				wmColor = watermarkColor.getBackground();
