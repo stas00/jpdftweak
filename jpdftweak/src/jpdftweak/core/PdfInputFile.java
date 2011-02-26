@@ -8,8 +8,10 @@ import java.util.Map;
 import jpdftweak.Main;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.exceptions.BadPasswordException;
+import com.itextpdf.text.exceptions.InvalidPdfException;
 import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfPageLabels;
 import com.itextpdf.text.pdf.PdfReader;
@@ -32,8 +34,29 @@ public class PdfInputFile {
 	}
 
 	private void open() throws IOException {
-		RandomAccessFileOrArray raf = new RandomAccessFileOrArray(file.getAbsolutePath(), false, true);
-		rdr = new PdfReader(raf, ownerPassword.getBytes("ISO-8859-1"));
+		try {
+			RandomAccessFileOrArray raf = new RandomAccessFileOrArray(file.getAbsolutePath(), false, true);
+			open(new PdfReader(raf, ownerPassword.getBytes("ISO-8859-1")));
+		} catch (ExceptionConverter ex) {
+			while (ex.getException() instanceof ExceptionConverter) {
+				ex = (ExceptionConverter)ex.getCause();
+			}
+			if (ex.getException() instanceof InvalidPdfException) {
+				try {
+					// The PdfReader constructor that takes a file name does more thorough checking and reparing, 
+					// but it will need more RAM. Therefore, if the first one fails, try that one now.
+					open(new PdfReader(file.getAbsolutePath(), ownerPassword.getBytes("ISO-8859-1")));
+				} catch (ExceptionConverter ex2) {
+					throw ex;
+				}
+			} else {
+				throw ex;
+			}
+		}
+	}
+
+	private void open(PdfReader reader) throws IOException {
+		rdr = reader;
 		if (!rdr.isOpenedWithFullPermissions())
 			throw new BadPasswordException("PdfReader not opened with owner password");
 		rdr.consolidateNamedDestinations();
