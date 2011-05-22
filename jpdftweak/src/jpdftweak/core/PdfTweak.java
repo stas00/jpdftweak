@@ -19,7 +19,6 @@ import java.util.Map;
 import jpdftweak.core.ShuffleRule.PageBase;
 
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Rectangle;
@@ -658,7 +657,7 @@ public class PdfTweak {
 						cb.stroke();
 					}
 				} else {
-					document.add(Chunk.NEWLINE);
+					writer.setPageEmpty(false);
 				}
 			}
 		}
