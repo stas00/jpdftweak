@@ -318,12 +318,18 @@ public class PdfTweak {
 					throw new IOException("Output filename does not contain *");
 				String prefix = fn.substring(0, fn.indexOf('*'));
 				String suffix = fn.substring(fn.indexOf('*')+1);
+				String[] pageLabels = PdfPageLabels.getPageLabels(currentReader);
 				for(int pagenum=1; pagenum <= currentReader.getNumberOfPages(); pagenum++) {
 					Document document = new Document(currentReader.getPageSizeWithRotation(1));
-					if (inputFiles.contains(new File(prefix+pagenum+suffix).getCanonicalFile()))
+					String pageNumber = ""+pagenum;
+					if (pageLabels != null && pagenum <= pageLabels.length)
+						pageNumber = pageLabels[pagenum - 1];
+					File outFile = new File(prefix+pageNumber+suffix);
+					if (inputFiles.contains(outFile.getCanonicalFile()))
 						throw new IOException("Output file must be different from input file(s)");
-					PdfCopy copy = new PdfCopy(document,
-							new FileOutputStream(prefix+pagenum+suffix));
+					if (!outFile.getParentFile().isDirectory())
+						outFile.getParentFile().mkdirs();
+					PdfCopy copy = new PdfCopy(document, new FileOutputStream(outFile));
 					setEncryptionSettings(copy);
 					if (fullyCompressed)
 						copy.setFullCompression();
