@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfToImage;
-import jpdftweak.core.PdfToImage.ImageType;
 import jpdftweak.core.PdfTweak;
 
 import com.itextpdf.text.DocumentException;
@@ -17,7 +16,6 @@ public class BurstImagesOption implements CommandOption {
 	private int quality = 100;
 	private boolean transparent = false;
 
-	@Override
 	public boolean supportsOption(String option) {
 		return option.equals("-colormode") || option.equals("-tiffcompression")
 				|| option.equals("-transparency")
@@ -25,7 +23,6 @@ public class BurstImagesOption implements CommandOption {
 				|| option.equals("-burstfiletype");
 	}
 
-	@Override
 	public boolean setOption(String option, String value) throws IOException, DocumentException{
 		if (option.equals("-colormode")) {
 			try{
@@ -96,7 +93,6 @@ public class BurstImagesOption implements CommandOption {
 		}
 	}
 
-	@Override
 	public void run(PdfTweak tweak, PdfInputFile masterFile)
 			throws IOException, DocumentException {
 		if (fileType != null && fileType != PdfToImage.ImageType.PDF) {
@@ -110,7 +106,6 @@ public class BurstImagesOption implements CommandOption {
 		}
 	}
 
-	@Override
 	public String getSummary() {
 		return " -colormode              Set the color mode of the exported images\n"
 				+ " -tiffcompression        Set compression type for TIFF image files\n"
@@ -119,7 +114,6 @@ public class BurstImagesOption implements CommandOption {
 				+ " -burstfiletype          Set the file type of the burst pages\n";
 	}
 
-	@Override
 	public String getHelp(String option) {
 		if (option.equals("-colormode")) {
 			return " -colormode {MODE}\n"
