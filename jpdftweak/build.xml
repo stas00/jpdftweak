@@ -7,6 +7,7 @@
 	<property name="BCMAIL" value="${LIB}/bcmail.jar" />
 	<property name="BCTSP" value="${LIB}/bctsp.jar" />
 	<property name="FORMS" value="${LIB}/forms.jar" />
+	<property name="JMUPDF" value="${LIB}/JMuPdf.jar" />
 	<property name="PROGUARD" value="${LIB}/proguard.jar" />
 
 	<target name="clean">
@@ -20,6 +21,7 @@
 			<classpath>
 				<pathelement path="${ITEXT}" />
 				<pathelement path="${FORMS}" />
+				<pathelement path="${JMUPDF}" />
 			</classpath>
 		</javac>
 		<copy todir="build/bin">
@@ -33,7 +35,7 @@
 		<jar destfile="jpdftweak.jar" basedir="build/bin">
 			<manifest>
 				<attribute name="Main-Class" value="jpdftweak.Main"/>
-				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar"/>
+				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar lib/JmuPdf.jar"/>
 			</manifest>
 		</jar>
 	</target>
@@ -51,6 +53,7 @@
 				<include name="${BCMAIL}"/>
 				<include name="${BCTSP}"/>
 				<include name="${FORMS}"/>
+				<include name="${JMUPDF}"/>
 			</zipgroupfileset>
 		</zip>
 		<zip destfile = "build/libs.jar">
@@ -64,6 +67,12 @@
 				<exclude name="org/bouncycastle/mail/**"/>
 				<exclude name="org/bouncycastle/util/IPTest.class"/>
 				<exclude name="org/bouncycastle/util/AllTests.class"/>
+				<exclude name="com/jmupdf/swing/**"/>
+				<exclude name="com/jmupdf/util/**"/>
+				<exclude name="com/examples/**"/>
+				<include name="com/jmupdf/PdfDocument.class"/>
+				<include name="com/jmupdf/PdfRenderer.class"/>
+				<include name="com/jmupdf/PdfPage.class"/>
 			</zipfileset>
 		</zip>
 		<java fork="true" jar="${PROGUARD}">
@@ -76,18 +85,34 @@
 	
 	<target name="dist" depends="jar, staticjar">
 		<copy todir="dist/src">
-			<fileset dir="." includes="build.xml,jpdftweak.bat,jpdftweak.pro,*.txt,*.ico,icons/**,manual/**,src/**,lib/README,lib/itext.diff"/>
+			<fileset dir="." includes="build.xml,jpdftweak.bat,jpdftweak.pro,*.txt,*.ico,icons/**,manual/**,src/**,lib/README.txt,lib/itext.diff"/>
 		</copy>
 		<copy todir="dist/bin">
 			<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,*.ico,icons/*.png,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
 		</copy>
 		<copy todir="dist/nolib">
 			<fileset dir="dist/bin" excludes="lib/*.jar"/>
-			<fileset dir="." includes="lib/README"/>
+			<fileset dir="." includes="lib/README.txt"/>
 		</copy>
 		<copy todir="dist/compact">
 			<fileset dir="dist/bin" excludes="lib,lib/**,jpdftweak.jar"/>
 		</copy>
 		<copy file="jpdftweak-static.jar" tofile="dist/compact/jpdftweak.jar"/>		
+		<copy todir="dist/win_x64">
+			<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,*.ico,icons/*.png,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
+			<fileset dir="lib" includes="jmupdf64.dll"/>
+		</copy>
+		<copy todir="dist/win_x32">
+			<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,*.ico,icons/*.png,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
+			<fileset dir="lib" includes="jmupdf32.dll" />
+		</copy>
+		<copy todir="dist/linux_x64">
+				<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,*.ico,icons/*.png,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
+				<fileset dir="lib" includes="libjmupdf64.so" />
+		</copy>
+		<copy todir="dist/linux_x32">
+				<fileset dir="." includes="jpdftweak.jar,jpdftweak.bat,*.txt,*.ico,icons/*.png,manual/**,lib/*.jar" excludes="lib/proguard.jar"/>
+				<fileset dir="lib" includes="libjmupdf32.so" />
+		</copy>
 	</target>
 </project>

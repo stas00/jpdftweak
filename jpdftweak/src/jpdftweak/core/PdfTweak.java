@@ -115,6 +115,7 @@ public class PdfTweak {
 	private boolean preserveHyperlinks;
 	private File tempfile1 = null, tempfile2 = null;
 	private List<File> inputFiles = new ArrayList<File>();
+	private PdfToImage pdfImages;
 
 	public PdfTweak(PdfInputFile singleFile, boolean useTempFiles) throws IOException {
 		if (useTempFiles) {
@@ -161,6 +162,11 @@ public class PdfTweak {
 		copyXMPMetadata(firstReader, copy);
 		document.close();
 		copyInformation(firstReader, currentReader = getTempPdfReader(baos));
+	}
+	
+	
+	public void setPdfImages(PdfToImage pdfImages){
+		this.pdfImages = pdfImages;
 	}
 	
 	private void copyXMPMetadata(PdfReader reader, PdfWriter writer) throws IOException {
@@ -263,7 +269,11 @@ public class PdfTweak {
 		}
 	}
 
-	public void writeOutput(String outputFile, boolean burst, boolean uncompressed, boolean sizeOptimize, boolean fullyCompressed) throws IOException, DocumentException {
+	public void writeOutput(String outputFile, boolean multipageTiff, boolean burst, boolean uncompressed, boolean sizeOptimize, boolean fullyCompressed) throws IOException, DocumentException{
+		if(!outputFile.contains(File.separator)){
+			File temp = new File(outputFile);
+			outputFile = temp.getAbsolutePath();
+		}
 		if (sizeOptimize) {
 			Document document = new Document(currentReader.getPageSizeWithRotation(1));
 			OutputStream baos = createTempOutputStream();
@@ -308,17 +318,37 @@ public class PdfTweak {
 			throw new IOException("Output file must be different from input file(s)");
 		cargoCult();
 		try {
-			if (uncompressed) {
+			if (uncompressed && pdfImages == null) {
 				Document.compress = false;
 			}
 			int total = currentReader.getNumberOfPages();
-			if (burst) {
+			if(multipageTiff){
+				if (outputFile.indexOf('*') != -1)
+					throw new IOException("TIFF multipage filename should not contain *");
+				Document document = new Document(currentReader.getPageSizeWithRotation(1));
+				OutputStream baos = new ByteArrayOutputStream();
+				PdfCopy copy = new PdfCopy(document,baos);
+				document.open();
+				PdfImportedPage page;
+				for(int pagenum=1; pagenum <= currentReader.getNumberOfPages(); pagenum++) {
+					page = copy.getImportedPage(currentReader, pagenum);
+					copy.addPage(page);
+				}
+				PRAcroForm form = currentReader.getAcroForm();
+				if (form != null) {
+					copy.copyAcroForm(currentReader);
+				}
+				document.close();
+				pdfImages.convertToMultiTiff(((ByteArrayOutputStream)baos).toByteArray(),outputFile);
+			}else if(burst){
 				String fn = outputFile;
 				if (fn.indexOf('*') == -1)
 					throw new IOException("Output filename does not contain *");
 				String prefix = fn.substring(0, fn.indexOf('*'));
 				String suffix = fn.substring(fn.indexOf('*')+1);
 				String[] pageLabels = PdfPageLabels.getPageLabels(currentReader);
+				PdfCopy copy = null;
+				OutputStream baos = null;
 				for(int pagenum=1; pagenum <= currentReader.getNumberOfPages(); pagenum++) {
 					Document document = new Document(currentReader.getPageSizeWithRotation(1));
 					String pageNumber = ""+pagenum;
@@ -329,10 +359,15 @@ public class PdfTweak {
 						throw new IOException("Output file must be different from input file(s)");
 					if (!outFile.getParentFile().isDirectory())
 						outFile.getParentFile().mkdirs();
-					PdfCopy copy = new PdfCopy(document, new FileOutputStream(outFile));
-					setEncryptionSettings(copy);
-					if (fullyCompressed)
-						copy.setFullCompression();
+					if(pdfImages.shouldExecute()){
+						baos = new ByteArrayOutputStream();
+						copy = new PdfCopy(document,baos);
+					} else {
+						copy = new PdfCopy(document,new FileOutputStream(outFile));
+						setEncryptionSettings(copy);
+						if (fullyCompressed)
+							copy.setFullCompression();
+					}
 					document.open();
 					PdfImportedPage page;
 					page = copy.getImportedPage(currentReader, pagenum);
@@ -342,6 +377,9 @@ public class PdfTweak {
 						copy.copyAcroForm(currentReader);
 					}
 					document.close();
+					if(pdfImages.shouldExecute()){
+						pdfImages.convertToImage(((ByteArrayOutputStream)baos).toByteArray(),prefix+pageNumber+suffix);
+					}
 				}
 			} else {
 				PdfStamper stamper;
