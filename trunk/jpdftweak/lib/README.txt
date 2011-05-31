@@ -18,6 +18,11 @@ To compile jPDFtweak, you need the following libraries:
 * JGoodies Forms, available from http://www.jgoodies.com/freeware/forms/
   Version 1.3.0 or newer
   -> forms.jar
+  
+* JMuPdf, available from http://sourceforge.net/projects/jmupdf/
+  Version published on 2011/03/20 or newer
+  -> JMuPdf.jar
+  
 
 You can obtain the precompiled files from the "-shared" binary package,
 if you do not want to collect/compile them yourself.

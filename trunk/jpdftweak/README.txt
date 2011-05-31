@@ -9,6 +9,13 @@ java -jar jpdftweak.jar
 
 For the command line options, add -help to the command line above.
 
+In compact version "burst in image file type" and "export in Tiff multipage"
+features are not available. In normal versions to use those features, a shared
+library file must be located in the same path with jpdftweak.jar.
+Those two features are not yet supported by MacOS Systems.
+For more details please read the section 
+"Burst as Image / Export Multipage Tiff Features" below.
+
 If you have the compact version and have problems, you might try
 if they are present in the "normal" version as well.
 
@@ -32,6 +39,21 @@ to for example
 to allow for 256 MB of RAM. Alternatively, if you want to perform lots 
 of operations, you can check the "Use temporary files" option on the
 Output tab.
+
+Burst as Image / Export Multipage Tiff Features
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To burst pages as image files or export in multipage Tiff shared 
+libraries are required to be in the same path with this jar.
+Those libraries are included in normal version
+or can separately downloaded from 
+"http://sourceforge.net/projects/jmupdf/"
+Shared Libraries List
+---------------------
+Windows x86 ~> jmupdf32.dll
+Windows x64 ~> jmupdf64.dll
+Linux x86 ~> libjmupdf32.so 
+Linux x64 ~> libjmupdf64.so 
+
 
 License
 ~~~~~~~

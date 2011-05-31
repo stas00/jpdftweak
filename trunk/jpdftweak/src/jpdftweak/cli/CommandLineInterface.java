@@ -21,17 +21,17 @@ public class CommandLineInterface {
 
 	private List<CommandOption[]> options = new ArrayList<CommandOption[]>();
 	
-	public CommandLineInterface(String[] args) throws IOException, DocumentException {
+	public CommandLineInterface(String[] args) throws IOException, DocumentException, NoSuchFieldException{
 		PdfInputFile input = null;
 		List<PdfPageRange> pageRanges = new ArrayList<PdfPageRange>();
 		Map<String,PdfInputFile> aliases = new HashMap<String, PdfInputFile>();
 		String output = null;
-		boolean burstOutput = false, uncompressedOutput=false, markedOutput = false, sizeOptimize = false, fullyCompress = false;
+		boolean burstOutput = false, multipageTiff = true, uncompressedOutput=false, markedOutput = false, sizeOptimize = false, fullyCompress = false;
 		String password = "";
 		boolean useTempFiles = false;
 		
 		Pattern inputOption = Pattern.compile("-i((~?[0-9]+)(-(~?[0-9]+)?)?)?([eo]?)");
-		Pattern outputOption = Pattern.compile("-o[mubstc]*");
+		Pattern outputOption = Pattern.compile("-o[mubistc]*");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-help") || args[i].equals("-?") || args[i].equals("/?")) {
 				if (i == args.length-1) {
@@ -80,6 +80,7 @@ public class CommandLineInterface {
 					markedOutput = args[i].contains("m");
 					uncompressedOutput = args[i].contains("u");
 					burstOutput = args[i].contains("b");
+					multipageTiff = args[i].contains("i");
 					useTempFiles = args[i].contains("t");
 					sizeOptimize = args[i].contains("s");
 					fullyCompress = args[i].contains("c");
@@ -147,7 +148,7 @@ public class CommandLineInterface {
 					else
 						tweak.removePageMarks();
 				}
-				tweak.writeOutput(output, burstOutput, uncompressedOutput, sizeOptimize, fullyCompress);
+				tweak.writeOutput(output, multipageTiff, burstOutput, uncompressedOutput, sizeOptimize, fullyCompress);
 				System.err.println("Output file written successfully.");
 			}
 		} finally {
@@ -170,7 +171,8 @@ public class CommandLineInterface {
 				new DocInfoOption(),
 				new EncryptOptions(),
 				new SignOptions(),
-				new InfoOption()
+				new InfoOption(),
+				new BurstImagesOption()
 		};
 	}
 
