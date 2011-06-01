@@ -148,6 +148,11 @@ public class CommandLineInterface {
 					else
 						tweak.removePageMarks();
 				}
+				if(multipageTiff && tweak.getPdfImages() == null){
+					BurstImagesOption option = new BurstImagesOption();
+					option.setOption("-burstfiletype", "TIFF");
+					option.run(tweak, input);
+				}
 				tweak.writeOutput(output, multipageTiff, burstOutput, uncompressedOutput, sizeOptimize, fullyCompress);
 				System.err.println("Output file written successfully.");
 			}

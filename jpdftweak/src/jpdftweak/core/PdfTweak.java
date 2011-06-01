@@ -169,6 +169,10 @@ public class PdfTweak {
 		this.pdfImages = pdfImages;
 	}
 	
+	public PdfToImage getPdfImages(){
+		return this.pdfImages;
+	}
+	
 	private void copyXMPMetadata(PdfReader reader, PdfWriter writer) throws IOException {
 		PdfObject xmpObject = PdfReader.getPdfObject(reader.getCatalog().get(PdfName.METADATA));
 		if (xmpObject != null && xmpObject.isStream()) {
