@@ -125,7 +125,7 @@ public class PdfToImage {
 				|| imageType == ImageType.PNM
 				|| imageType == ImageType.TIFF) {
 			exportUsingJmuPdf(pdfDocument, outputFilePath);
-		} else if (imageType.equals("GIF") || imageType.equals("BMP")) {
+		} else if (imageType == ImageType.GIF || imageType == ImageType.BMP) {
 			exportUsingImageIO(renderPage(page), outputFilePath);
 		}
 		pdfDocument.dispose();
