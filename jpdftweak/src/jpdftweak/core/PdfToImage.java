@@ -104,32 +104,32 @@ public class PdfToImage {
 	}
 
 	/**
-	 * Gets a PDF PdfDocument in byte array form and converts the
+	 * Gets a PDF document in byte array form and converts the
 	 * first page to an image file type, user had chosen before.  
 	 * JmuPdf does not support "GIF" and "BMP" file types but has 
-	 * the ability to convert a PDF PdfDocument to BufferedImage.
+	 * the ability to convert a PDF document to BufferedImage.
 	 * This Buffered image is converted to "GIF" or "BMP" using ImageIO.
-	 * @param docByte PDF PdfDocument in Byte array
+	 * @param docByte PDF document in Byte array
 	 * @param outputPath The path that image file must be created
 	 * @throws IOException  
 	 */
 	public void convertToImage(byte[] docByte, String outputPath)
 			throws IOException {
-		PdfDocument PdfDocument;
+		PdfDocument document;
 		try {
-			PdfDocument = new PdfDocument(docByte);
-		Page page = PdfDocument.getPage(1);
+			document = new PdfDocument(docByte);
+		Page page = document.getPage(1);
 		String outputFilePath = outputPath.substring(0,outputPath.lastIndexOf(".")+1)+imageType.toString().toLowerCase();
 		if (imageType == ImageType.JPG
 				|| imageType == ImageType.PNG
 				|| imageType == ImageType.PAM 
 				|| imageType == ImageType.PNM
 				|| imageType == ImageType.TIFF) {
-			exportUsingJmuPdf(PdfDocument, outputFilePath);
+			exportUsingJmuPdf(document, outputFilePath);
 		} else if (imageType == ImageType.GIF || imageType == ImageType.BMP) {
 			exportUsingImageIO(renderPage(page), outputFilePath);
 		}
-		PdfDocument.dispose();
+		document.dispose();
 		} catch (Exception e) {
 			IOException ioe = new IOException(e.toString());
 			ioe.initCause(e);
@@ -145,12 +145,12 @@ public class PdfToImage {
 	 * @throws IOException
 	 */
 	public void convertToMultiTiff(byte[] docByte, String outputPath) throws IOException{
-		PdfDocument PdfDocument;
+		PdfDocument document;
 		try {
-			PdfDocument = new PdfDocument(docByte);
+			document = new PdfDocument(docByte);
 			String outputFilePath = outputPath.substring(0,outputPath.lastIndexOf(".")+1)+"tiff";
-			for (int i = 0; i < PdfDocument.getPageCount(); i++) {
-				PdfDocument.saveAsTif((i + 1), 
+			for (int i = 0; i < document.getPageCount(); i++) {
+				document.saveAsTif((i + 1), 
 						outputFilePath, 
 						1.0f, 
 						transparent, 
@@ -159,7 +159,7 @@ public class PdfToImage {
 						Document.TIF_DATA_APPEND, 
 						quality);
 			}
-			PdfDocument.dispose();
+			document.dispose();
 		} catch (Exception e) {
 			IOException ioe = new IOException(e.toString());
 			ioe.initCause(e);
@@ -167,10 +167,10 @@ public class PdfToImage {
 		}
 	}
 
-	private void exportUsingJmuPdf(PdfDocument PdfDocument,String outputFilePath) {
+	private void exportUsingJmuPdf(PdfDocument document,String outputFilePath) {
 		switch (imageType) {
 		case JPG:{
-			PdfDocument.saveAsJPeg(1, 
+			document.saveAsJPeg(1, 
 					outputFilePath, 
 					1.0f, 
 					colorMode, 
@@ -178,7 +178,7 @@ public class PdfToImage {
 			break;
 		}
 		case PNG:{
-			PdfDocument.saveAsPng(1, 
+			document.saveAsPng(1, 
 					outputFilePath, 
 					1.0f, 
 					transparent,
@@ -186,7 +186,7 @@ public class PdfToImage {
 			break;
 		}
 		case PAM:{
-			PdfDocument.saveAsPam(1, 
+			document.saveAsPam(1, 
 					outputFilePath, 
 					1.0f, 
 					transparent,
@@ -194,11 +194,11 @@ public class PdfToImage {
 			break;
 		}
 		case PNM:{
-			PdfDocument.saveAsPnm(1, outputFilePath, 1f, colorMode);
+			document.saveAsPnm(1, outputFilePath, 1f, colorMode);
 			break;
 		}
 		case TIFF:{
-			PdfDocument.saveAsTif(1, 
+			document.saveAsTif(1, 
 					outputFilePath, 
 					1.0f, 
 					transparent,
