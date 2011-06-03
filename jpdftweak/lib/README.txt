@@ -20,7 +20,7 @@ To compile jPDFtweak, you need the following libraries:
   -> forms.jar
   
 * JMuPdf, available from http://sourceforge.net/projects/jmupdf/
-  Version published on 2011/03/20 or newer
+  Version 0.2 beta released on 2011/06/02
   -> JMuPdf.jar
   
 

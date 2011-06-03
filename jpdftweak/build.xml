@@ -67,12 +67,11 @@
 				<exclude name="org/bouncycastle/mail/**"/>
 				<exclude name="org/bouncycastle/util/IPTest.class"/>
 				<exclude name="org/bouncycastle/util/AllTests.class"/>
-				<exclude name="com/jmupdf/swing/**"/>
 				<exclude name="com/jmupdf/util/**"/>
-				<exclude name="com/examples/**"/>
-				<include name="com/jmupdf/PdfDocument.class"/>
-				<include name="com/jmupdf/PdfRenderer.class"/>
-				<include name="com/jmupdf/PdfPage.class"/>
+				<include name="com/jmupdf/pdf/PdfDocument.class"/>
+				<include name="com/jmupdf/PageRenderer.class"/>
+				<include name="com/jmupdf/Page.class"/>
+				<include name="com/jmupdf/Document.class"/>
 			</zipfileset>
 		</zip>
 		<java fork="true" jar="${PROGUARD}">
