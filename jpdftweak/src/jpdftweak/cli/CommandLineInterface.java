@@ -26,7 +26,7 @@ public class CommandLineInterface {
 		List<PdfPageRange> pageRanges = new ArrayList<PdfPageRange>();
 		Map<String,PdfInputFile> aliases = new HashMap<String, PdfInputFile>();
 		String output = null;
-		boolean burstOutput = false, multipageTiff = true, uncompressedOutput=false, markedOutput = false, sizeOptimize = false, fullyCompress = false;
+		boolean burstOutput = false, multipageTiff = false, uncompressedOutput=false, markedOutput = false, sizeOptimize = false, fullyCompress = false;
 		String password = "";
 		boolean useTempFiles = false;
 		
@@ -164,6 +164,7 @@ public class CommandLineInterface {
 	private CommandOption[] buildOptions() {
 		return new CommandOption[] {
 				new PreserveHyperlinksOption(),
+				new CropOption(),
 				new RotateOption(),
 				new ScaleOption(),
 				new WatermarkOptions(),
