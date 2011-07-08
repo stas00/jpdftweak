@@ -435,6 +435,57 @@ public class PdfTweak {
 		tempfile1 = tempfile2 = null;
 	}
 
+	public void cropPages(PageBox cropTo) throws IOException, DocumentException {
+		OutputStream baos = createTempOutputStream();
+		Document document = new Document();
+		PdfWriter writer = PdfWriter.getInstance(document, baos);
+		PdfContentByte cb = null;
+		int[] rotations = new int[currentReader.getNumberOfPages()];
+		for (int i = 1; i <= currentReader.getNumberOfPages(); i++) {
+			PageBox box = cropTo;
+			Rectangle pageSize = currentReader.getPageSize(i);
+			Rectangle currentSize = null;
+			while (box != null) {
+				 currentSize = currentReader.getBoxSize(i, box.getBoxName());
+				 if (currentSize != null)
+					 break;
+				 box = box.defaultBox;
+			}
+			if (currentSize == null)
+				currentSize = pageSize;
+			document.setMargins(0, 0, 0, 0);
+			document.setPageSize(new Rectangle(currentSize.getWidth(), currentSize.getHeight())); 
+			if (cb == null) {
+				document.open();
+				cb = writer.getDirectContent();
+			} else {
+				document.newPage();
+			}
+			rotations[i-1] = currentReader.getPageRotation(i);
+			PdfImportedPage page = writer.getImportedPage(currentReader, i);
+			cb.addTemplate(page, pageSize.getLeft()-currentSize.getLeft(), pageSize.getBottom()-currentSize.getBottom());
+			if (preserveHyperlinks) {
+				List links = currentReader.getLinks(i);
+				for (int j = 0; j < links.size(); j++) {
+					PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
+					if (link.isInternal()) {
+						link.transformDestination(1, 0, 0, 1, pageSize.getLeft()-currentSize.getLeft(), pageSize.getBottom()-currentSize.getBottom());
+					}
+					link.transformRect(1, 0, 0, 1, pageSize.getLeft()-currentSize.getLeft(), pageSize.getBottom()-currentSize.getBottom());
+					writer.addAnnotation(link.createAnnotation(writer));
+				}
+			}
+		}
+		copyXMPMetadata(currentReader, writer);
+		document.close();
+		copyInformation(currentReader, currentReader = getTempPdfReader(baos));
+		// restore rotation
+		for(int i=1; i<=currentReader.getNumberOfPages(); i++) {
+			PdfDictionary dic = currentReader.getPageN(i);
+			dic.put(PdfName.ROTATE, new PdfNumber(rotations[i-1]));
+		}
+	}
+	
 	public void rotatePages(int portraitCount, int landscapeCount) {
 		for(int i=1; i<=currentReader.getNumberOfPages(); i++) {
 			int rotation = currentReader.getPageRotation(i);
@@ -914,5 +965,22 @@ public class PdfTweak {
 
 	public void preserveHyperlinks() {
 		preserveHyperlinks = true;
+	}
+	
+	public enum PageBox {
+		MediaBox(null), 
+		CropBox(PageBox.MediaBox), 
+		BleedBox(PageBox.CropBox), 
+		TrimBox(PageBox.CropBox),
+		ArtBox(PageBox.TrimBox);
+		
+		public final PageBox defaultBox;
+		private PageBox(PageBox defaultBox) {
+			this.defaultBox = defaultBox;
+		}
+		
+		private String getBoxName() {
+			return name().substring(0, name().length()-3).toLowerCase();
+		}
 	}
 }
