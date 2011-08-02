@@ -929,6 +929,8 @@ public class PdfTweak {
 			KeyStore ks = KeyStore.getInstance("JKS");
 			ks.load(new FileInputStream(keystoreFile), password);
 			key = (PrivateKey)ks.getKey(alias, password);
+			if (key == null)
+				throw new IOException("No private key found with alias " + alias);
 			certChain = ks.getCertificateChain(alias);
 			this.certificationLevel = certificationLevel;
 			this.sigVisible = visible;
