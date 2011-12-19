@@ -890,6 +890,11 @@ public class PdfTweak {
 						throw new IOException(ex.toString());
 					}
 				}
+				if ((pnXPosition != 1 && pnHOff * 2 < bf.getWidthPoint(number, pnSize)) ||
+					    (pnPosition / 3 == 0 && pnVOff < bf.getDescentPoint(number, pnSize)) || 
+					    (pnPosition / 3 == 2 && pnVOff < bf.getAscentPoint(number, pnSize))) {
+					throw new IOException("Page number "+number+" is not within page bounding box");
+				}
 				overContent.showTextAligned(PdfContentByte.ALIGN_CENTER, number, xx, yy, 0);
 				overContent.endText();
 			}
