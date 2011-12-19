@@ -137,7 +137,7 @@ public class PdfTweak {
 		inputFiles.add(f.getCanonicalFile());
 	}
 
-	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges, boolean useTempFiles) throws IOException, DocumentException {
+	public PdfTweak(PdfInputFile firstFile, List<PdfPageRange> pageRanges, boolean useTempFiles, int interleaveSize) throws IOException, DocumentException {
 		this(firstFile, useTempFiles);
 		OutputStream baos = createTempOutputStream();
 		PdfReader firstReader = firstFile.getReader();
@@ -145,15 +145,49 @@ public class PdfTweak {
 		PdfCopy copy = new PdfCopy(document, baos);
 		document.open();
 		PdfImportedPage page;
-		for(PdfPageRange pageRange : pageRanges) {
-			int[] pages = pageRange.getPages();
-			for (int i = 0; i < pages.length; i++) {
-				page = pageRange.getInputFile().getImportedPage(copy, pages[i]);
-				copy.addPage(page);
+		if (interleaveSize == 0) {
+			int pagesBefore = 0;
+			for(PdfPageRange pageRange : pageRanges) {
+				int[] pages = pageRange.getPages(pagesBefore);
+				for (int i = 0; i < pages.length; i++) {
+					if (pages[i] == -1) {
+						copy.addPage(pageRange.getInputFile().getPageSize(1), 0);
+					} else {
+						page = pageRange.getInputFile().getImportedPage(copy, pages[i]);
+						copy.addPage(page);
+					}
+				}
+				pagesBefore += pages.length;
+				File f = pageRange.getInputFile().getFile().getCanonicalFile();
+				if (!inputFiles.contains(f))
+					inputFiles.add(f);
 			}
-			File f = pageRange.getInputFile().getFile().getCanonicalFile();
-			if (!inputFiles.contains(f))
-				inputFiles.add(f);
+		} else {
+			int[][] pagesPerRange = new int[pageRanges.size()][];
+			int maxLength = 0;
+			for (int i = 0; i < pagesPerRange.length; i++) {
+				PdfPageRange range = pageRanges.get(i);
+				pagesPerRange[i]= range.getPages(0);;
+				if (pagesPerRange[i].length > maxLength)
+					maxLength = pagesPerRange[i].length;
+			}
+			int blockCount = (maxLength + interleaveSize - 1) / interleaveSize;
+			for (int i = 0; i < blockCount; i++) {
+				for (int j = 0; j < pageRanges.size(); j++) {
+					PdfPageRange pageRange = pageRanges.get(j);
+					int[] pages = pagesPerRange[j];
+					for (int k = 0; k < interleaveSize; k++) {
+						int pageIndex = i * interleaveSize + k;
+						int pageNum = pageIndex < pages.length ? pages[pageIndex] : -1;
+						if (pageNum == -1) {
+							copy.addPage(pageRange.getInputFile().getPageSize(1), 0);
+						} else {
+							page = pageRange.getInputFile().getImportedPage(copy, pageNum);
+							copy.addPage(page);
+						}
+					}					
+				}
+			}
 		}
 		PRAcroForm form = firstReader.getAcroForm();
 		if (form != null) {
