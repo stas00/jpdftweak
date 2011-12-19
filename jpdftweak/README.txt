@@ -71,6 +71,35 @@ Please send bug reports and suggestions to <schierlm@users.sourceforge.net>.
 ChangeLog
 ~~~~~~~~~
 
++++ 2011-12-19 Released version 1.1 +++
+
+- Add new interleave option to CLI and GUI to interleave two documents
+- Add support to add empty pages before including a PdfPageRange
+- Add new -crop option to GUI and CLI to crop the document to one of the 
+  PDF Page Boxes (if the document contains them)
+- Add "book printing" feature: Repeat shuffle rule for blocks of a fixed size
+- Add "Split 2-Up" shuffle rule contributed by 
+  Paolo Bonzini <bonzini at gnu dot org>
+- Add new function to export PDF pages as images in various image formats
+  or export PDF Documents to multi-page TIFF on supported platforms, 
+  uses native JMuPdf library
+- Bug fixes and internal improvements:
+  * Update iText (5.1.3), BouncyCastle (1.46), JGoodies Forms (1.4.2)
+    and Proguard (4.6); iText fixes (among other things) incorrect page 
+    label rendering for EMPTY page labels
+  * Show an error if page number label does not fit completely inside the page bounding box
+  * Properly complain when trying to sign with an alias that has no private key assigned
+  * Properly reject font sizes of 0 on the Watermark tab as they will 
+    cause a crash later
+  * Create proper error messages when using invalid Page specification 
+    in a shuffle rule
+  * Try to load the PDF in non-partial mode if loading in partial mode
+    fails, since non-partial mode can rebuild the xref table when broken.
+  * change the way to generate empty pages in shuffle rules; 
+    the new way will create slightly smaller PDFs
+  * create directory for burst pages if it does not exist
+  * Use page labels in burst filenames if present
+
 +++ 2010-12-27 Released version 1.0 +++
 
 - Add shuffle rule to reverse page order
