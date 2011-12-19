@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import jpdftweak.core.IntegerList;
 import jpdftweak.core.PdfBookmark;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfPageRange;
@@ -33,8 +34,8 @@ import com.itextpdf.text.exceptions.BadPasswordException;
 
 public class InputTab extends Tab {
 
-	private JTextField filename;
-	private JCheckBox multiFiles, batchProcessing;
+	private JTextField filename, interleaveSize;
+	private JCheckBox multiFiles, batchProcessing, interleave;
 	private TableComponent fileCombination;
 	private JButton selectfile;
 	private List<PdfInputFile> inputFiles = new ArrayList<PdfInputFile>();
@@ -44,20 +45,20 @@ public class InputTab extends Tab {
 	private boolean useTempFiles = false;
 
 	public InputTab(MainForm mf) {
-		super(new FormLayout("f:p, f:p:g, f:p, f:p", "f:p, f:p, f:p:g"));
+		super(new FormLayout("f:p, f:p:g, f:p, f:p, f:p, f:p", "f:p, f:p, f:p:g"));
 		this.mf = mf;
 		CellConstraints cc = new CellConstraints();
 		this.add(new JLabel("Filename"), cc.xy(1,1));
-		this.add(filename = new JTextField(), cc.xy(2, 1));
+		this.add(filename = new JTextField(), cc.xyw(2, 1, 3));
 		filename.setEditable(false);
-		this.add(selectfile = new JButton("Select..."), cc.xy(3, 1));
+		this.add(selectfile = new JButton("Select..."), cc.xy(5, 1));
 		selectfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectFile();
 			}
 		});
 		JButton clear;
-		this.add(clear = new JButton("Clear"), cc.xy(4,1));
+		this.add(clear = new JButton("Clear"), cc.xy(6,1));
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				filesCombo.removeAllItems();
@@ -80,6 +81,8 @@ public class InputTab extends Tab {
 					batchProcessing.setEnabled(false);
 					selectfile.setEnabled(true);
 					fileCombination.setEnabled(true);
+					interleave.setEnabled(true);
+					interleaveSize.setEnabled(interleave.isSelected());
 				} else if (batchProcessing.isSelected()) {
 					multiFiles.setEnabled(false);
 					selectfile.setEnabled(true);
@@ -88,14 +91,21 @@ public class InputTab extends Tab {
 					multiFiles.setEnabled(true);
 					selectfile.setEnabled(inputFiles.size() == 0);
 					fileCombination.setEnabled(false);
+					interleave.setEnabled(false);
+					interleaveSize.setEnabled(false);
 				}
 			}
 		};
 		multiFiles.addActionListener(l);
-		this.add(batchProcessing = new JCheckBox("Batch processing"), cc.xyw(3,2,2));
+		this.add(interleave = new JCheckBox("Interleave documents in blocks of"), cc.xy(3,2));
+		interleave.setEnabled(false);
+		interleave.addActionListener(l);
+		this.add(interleaveSize = new JTextField("1", 10), cc.xy(4,2));
+		interleaveSize.setEnabled(false);
+		this.add(batchProcessing = new JCheckBox("Batch processing"), cc.xyw(5,2,2));
 		batchProcessing.addActionListener(l);
 		filesCombo = new JComboBox();
-		this.add(fileCombination = new TableComponent(new String[] {"File", "From Page", "To Page", "Include Odd", "Include Even"}, new Class[] {PdfInputFile.class, Integer.class, Integer.class, Boolean.class, Boolean.class}, new Object[] {null, 1, -1, true, true}), cc.xyw(1, 3, 4));
+		this.add(fileCombination = new TableComponent(new String[] {"File", "From Page", "To Page", "Include Odd", "Include Even", "Empty Before"}, new Class[] {PdfInputFile.class, Integer.class, Integer.class, Boolean.class, Boolean.class, IntegerList.class}, new Object[] {null, 1, -1, true, true, new IntegerList("0")}), cc.xyw(1, 3, 6));
 		fileCombination.setEnabled(false);
 		fileCombination.getTable().getColumnModel().getColumn(0).setPreferredWidth(300);
 		fileCombination.getTable().getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(filesCombo));
@@ -104,6 +114,8 @@ public class InputTab extends Tab {
 				if (columnIndex < 3) {
 					Object[] row = fileCombination.getRow(rowIndex);
 					PdfInputFile ifile = (PdfInputFile)row[0];
+					if (row[1] == null) row[1] = 1;
+					if (row[2] == null) row[2] = -1;
 					int from = (Integer)row[1];
 					int to = (Integer)row[2];
 					int pages = ifile == null ? 1 : ifile.getPageCount();
@@ -138,6 +150,11 @@ public class InputTab extends Tab {
 								JOptionPane.showMessageDialog(InputTab.this.mf, "Entered value out of range. Value has been adjusted.", "JPDFTweak", JOptionPane.WARNING_MESSAGE);								
 							}
 						});
+					}
+				} else if (columnIndex == 5) {
+					Object[] row = fileCombination.getRow(rowIndex);
+					if(row[5] == null) {
+						row[5] = new IntegerList("0");
 					}
 				}
 			}
@@ -195,7 +212,7 @@ public class InputTab extends Tab {
 			inputFiles.add(f);
 			if (inputFiles.size() == 1) mf.setInputFile(f);
 			filesCombo.addItem(f);
-			fileCombination.addRow(f, 1, f.getPageCount(), true, true);
+			fileCombination.addRow(f, 1, f.getPageCount(), true, true, new IntegerList("0"), false);
 		}
 		if (!multiFiles.isSelected() && !batchProcessing.isSelected() && inputFiles.size() > 0)
 			selectfile.setEnabled(false);
@@ -221,10 +238,24 @@ public class InputTab extends Tab {
 		if (inputFiles.size() == 0) 
 			throw new IOException("No input file selected");
 		if (multiFiles.isSelected()) {
+			int pagesBefore = 0;
+			boolean interleaved = interleave.isSelected();
 			for(PdfPageRange range : getPageRanges()) {
-				if (range.getPages().length == 0) {
+				int[] pages = range.getPages(pagesBefore);
+				if (pages.length == 0) {
 					throw new IOException("At least one input file page range contains no pages");
 				}
+				if (!interleaved) {
+					pagesBefore += pages.length;
+				}
+			}
+			if (interleaved) {	
+				try {
+					int size = Integer.parseInt(interleaveSize.getText());
+					if (size < 1) throw new NumberFormatException();
+				} catch (NumberFormatException ex) {
+					throw new IOException("Invalid interleave block size");
+				}			
 			}
 		}
 	}
@@ -239,7 +270,11 @@ public class InputTab extends Tab {
 				f.reopen();
 			}
 			List<PdfPageRange> ranges = getPageRanges();
-			 return new PdfTweak(inputFiles.get(0), ranges, useTempFiles);
+			int isize = 0;
+			if (interleave.isSelected()) {
+				isize = Integer.parseInt(interleaveSize.getText());
+			}
+			return new PdfTweak(inputFiles.get(0), ranges, useTempFiles, isize);
 		} else {
 			inputFiles.get(0).reopen();
 			return new PdfTweak(inputFiles.get(0), useTempFiles);
@@ -267,7 +302,8 @@ public class InputTab extends Tab {
 			int to = (Integer)row[2];
 			boolean odd = (Boolean)row[3];
 			boolean even = (Boolean)row[4];
-			ranges.add(new PdfPageRange(ifile, from, to, odd, even));
+			IntegerList emptyBefore = (IntegerList) row[5];
+			ranges.add(new PdfPageRange(ifile, from, to, odd, even, emptyBefore));
 		}
 		return ranges;
 	}

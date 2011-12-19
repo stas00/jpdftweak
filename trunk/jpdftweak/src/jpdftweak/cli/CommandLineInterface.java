@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import com.itextpdf.text.DocumentException;
 
 import jpdftweak.Main;
+import jpdftweak.core.IntegerList;
 import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfPageRange;
 import jpdftweak.core.PdfTweak;
@@ -29,8 +30,9 @@ public class CommandLineInterface {
 		boolean burstOutput = false, multipageTiff = false, uncompressedOutput=false, markedOutput = false, sizeOptimize = false, fullyCompress = false;
 		String password = "";
 		boolean useTempFiles = false;
+		int interleaveSize = 0;
 		
-		Pattern inputOption = Pattern.compile("-i((~?[0-9]+)(-(~?[0-9]+)?)?)?([eo]?)");
+		Pattern inputOption = Pattern.compile("-i((~?[0-9]+)(-(~?[0-9]+)?)?)?([eo]?)(\\+[0-9,]+)?");
 		Pattern outputOption = Pattern.compile("-o[mubistc]*");
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-help") || args[i].equals("-?") || args[i].equals("/?")) {
@@ -51,6 +53,8 @@ public class CommandLineInterface {
 					return;
 				} else if (args[i].equals("-password")) {
 					password = args[i+1];
+				} else if (args[i].equals("-interleave")) {
+					interleaveSize = Integer.parseInt(args[i+1]);
 				} else if (inputOption.matcher(args[i]).matches()) {
 					Matcher m = inputOption.matcher(args[i]);
 					m.matches();
@@ -71,7 +75,8 @@ public class CommandLineInterface {
 					if (!aliases.containsKey(args[i+1])) {
 						aliases.put(args[i+1], new PdfInputFile(new File(args[i+1]), password));
 					}
-					PdfPageRange pr = new PdfPageRange(aliases.get(args[i+1]), from, to, !m.group(5).equals("e"), !m.group(5).equals("o"));
+					IntegerList emptyBefore = new IntegerList( m.group(6) == null ? "0" : m.group(6).substring(1)); 
+					PdfPageRange pr = new PdfPageRange(aliases.get(args[i+1]), from, to, !m.group(5).equals("e"), !m.group(5).equals("o"), emptyBefore);
 					pageRanges.add(pr);
 				} else if (args[i].startsWith("-i=")) {
 					aliases.put(args[i].substring(3), new PdfInputFile(new File(args[i+1]), password));
@@ -106,7 +111,7 @@ public class CommandLineInterface {
 					if (!aliases.containsKey(args[i])) {
 						aliases.put(args[i], new PdfInputFile(new File(args[i]), password));
 					}
-					PdfPageRange pr = new PdfPageRange(aliases.get(args[i]), 1, -1, true, true);
+					PdfPageRange pr = new PdfPageRange(aliases.get(args[i]), 1, -1, true, true, new IntegerList("0"));
 					pageRanges.add(pr);					
 				} else if (input != null || pageRanges.size()> 0 || aliases.size() > 0) {
 					output = args[i];
@@ -128,10 +133,10 @@ public class CommandLineInterface {
 			tweak = new PdfTweak(input, useTempFiles);
 		} else if (aliases.containsKey("master")) {
 			input = aliases.get("master");
-			tweak = new PdfTweak(input, pageRanges, useTempFiles);
+			tweak = new PdfTweak(input, pageRanges, useTempFiles, interleaveSize);
 		} else {
 			input = pageRanges.get(0).getInputFile();
-			tweak = new PdfTweak(input, pageRanges, useTempFiles);
+			tweak = new PdfTweak(input, pageRanges, useTempFiles, interleaveSize);
 		}
 		try {
 			for (CommandOption[] optionBlock : options) {
@@ -203,6 +208,7 @@ public class CommandLineInterface {
 				" -help {transformation}  Show help for a transformation\n"+
 				" -v[ersion]              Show version\n"+
 				" -password {password}    Use password for opening next input file\n"+
+				" -interleave {pages}     Interleave documents in blocks of {pages}\n"+
 				" -i[{options}]           next parameter is input file, see '-help -i'\n"+
 				" -i={ALIAS}              use ALIAS for next input file name, '-help -i'\n"+
 				" -o[{options}]           next parameter is output file, see '-help -o'\n"+
@@ -227,7 +233,11 @@ public class CommandLineInterface {
 					" -i3-9                     Load pages 3-9\n"+
 					" -i5-                      Load pages 5-end\n"+
 					" -ie                       Load even pages only\n"+
-					" -i1-~3o                   Load all but the last two pages, only odd pages\n"+
+					" -i+3                      Add 3 empty pages to the beginning\n"+
+					" -i+5,6                    Add 5 or 6 empty pages depending whether the current\n"+
+					"                           position is odd or even\n"+
+					" -i1-~3o+1                 Load all but the last two pages, only odd pages, \n"+
+					"                           and add one empty page\n"+
 					"You can load the file to an alias name using -i=ALIAS and use that alias name\n" +
 					"later; this is useful if you want to reference a file more than once and it has\n" +
 					"a long path/filename, or it requires a password. If you know 'pdftk', you know\n" +

@@ -215,7 +215,7 @@ public class PdfBookmark {
 			for (PdfBookmark b : bs) {
 				result.add(b.shiftPageNumber(offset));
 			}
-			offset += range.getPages().length;
+			offset += range.getPages(offset).length;
 		}
 		return result;
 	}
