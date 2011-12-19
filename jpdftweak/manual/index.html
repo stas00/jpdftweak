@@ -49,7 +49,19 @@ or running</p>
   the user password only, but it is not <i>allowed</i> to do so.</p>
 
 <p>All page numbers start with 1 (like normal people count), not with 0
-  (like programmers count).</p>
+  (like programmers count). To reverse the page order, use a From Page
+  that is larger than the To Page.</p>
+  
+<p>In case you have odd and even pages in separate documents (or even
+  more parts), you can use the Interleave feature to merge them again.</p>
+  
+<p>When combining multiple files, you might want to start each file on
+  an odd (or even) page; you can use the "Empty before" option for this.
+  In case you do not want to care if the document begins on an odd or even
+  page, you can give two numbers separated by comma, for odd and even page.
+  Therefore, <tt>0,1</tt> will make the document start on an odd page,
+  <tt>1,0</tt> on an even page, <tt>1,2</tt> will make it start on an 
+  even page with the odd page before blank, etc.</p>
 
 <p>Note that if you use the "combine multiple files" option, some options
   that are usually kept in the document are dropped, even if you only 
@@ -59,6 +71,11 @@ or running</p>
 
 <h3>The Page Size Tab</h3>
 <p><img src="shot02.png" width="763" height="544" alt="Page Size Options"></p>
+
+<p><b>Crop to</b>: This will crop the visible part of the PDF to one
+of the embedded page boxes (if present); Useful if you got a PDF intended
+for pre-press with visible crop marks and want to distribute it without
+showing the crop marks.</p>
 
 <p><b>Rotate Pages</b>: If you have a PDF that has both Portrait and Landscape pages, and
   your printer has problems in printing both, you can rotate the pages
@@ -132,6 +149,10 @@ So, for this common case, it is enough to configure the page numbers once.</p>
 
 <p>This might be the most powerful, and the most complex tab. Choose
   a preset and stick with it <tt>:-)</tt></p>
+  
+<p>If you want to print "booklets" that are thicker, you might prefer
+to shuffle blocks of 20 pages or so, then fold each of them 
+individually and stitch them together to a "book".</p>
 
 <p>If you want to build a config yourself: First specify how many
   pages each pass (each use of the template) covers. If you select 4
@@ -269,6 +290,11 @@ file.</p>
   source code. Search for "pdftk_PageNum" in the uncompressed
   PDF to find a page. When you compress a PDF again, you can remove
   these marks.</p>
+  
+<p>In case the matching JMuPdf native library is present, you can
+  also burst the document to images or save it as a multipage TIFF
+  document.</p>
+
 <hr>
-&copy; 2007-2010 Michael Schierl
+&copy; 2007-2011 Michael Schierl
 </body></html>
