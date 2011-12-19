@@ -665,7 +665,7 @@ public class PdfTweak {
 		copyInformation(currentReader, currentReader = getTempPdfReader(baos));
 	}
 
-	public void shufflePages(int passLength, ShuffleRule[] shuffleRules) throws DocumentException, IOException {
+	public void shufflePages(int passLength, int blockSize, ShuffleRule[] shuffleRules) throws DocumentException, IOException {
 		removeRotation();
 		OutputStream baos = createTempOutputStream();
 		Rectangle size = currentReader.getPageSize(1);
@@ -683,22 +683,75 @@ public class PdfTweak {
 		PdfTemplate page;
 		int pl = Math.abs(passLength);
 		int cnt = currentReader.getNumberOfPages();
-		int refcnt = ((cnt + (pl-1))/pl)*pl;
+		int passes = blockSize == 0 ? 1 : (cnt + blockSize - 1) / blockSize; 
 		int[] destinationPageNumbers = null;
 		ShuffleRule[] destinationShuffleRules = null;
 		if (preserveHyperlinks){
 			destinationPageNumbers = new int[cnt+1];
 			destinationShuffleRules = new ShuffleRule[cnt+1];
 			int ddPage=0;
-			for (int i = 0; i < cnt; i+=pl) {
+			for(int pass = 0; pass < passes; pass++) {
+				int passcnt = pass == passes - 1 ? cnt - pass * blockSize : blockSize; 
+				int refcnt = ((passcnt + (pl-1))/pl)*pl;
+				for (int i = 0; i < passcnt; i+=pl) {
+					int idx = i;
+					int reverseIdx=refcnt - idx - pl;
+					if (passLength <0) {
+						idx = i/2;
+						reverseIdx = refcnt - idx-pl;
+					}
+					idx += pass * blockSize;
+					reverseIdx += pass * blockSize;
+					for (ShuffleRule sr : shuffleRules) {
+						if (sr.isNewPageBefore()) ddPage++;
+						int pg = sr.getPageNumber();
+						if (sr.getPageBase() == PageBase.BEGINNING) {
+							pg += idx;
+						} else if (sr.getPageBase() == PageBase.END) {
+							pg += reverseIdx;
+						}
+						if (pg < 1)
+							throw new IOException("Invalid page number. Check your n-up rules.");
+						if (pg <= cnt) {
+							destinationPageNumbers[pg] = ddPage;
+							destinationShuffleRules[pg] = sr;
+						}
+					}
+				}
+			}
+		}
+		for(int pass = 0; pass < passes; pass++) {
+			int passcnt = pass == passes - 1 ? cnt - pass * blockSize : blockSize; 
+			int refcnt = ((passcnt + (pl-1))/pl)*pl;
+			for (int i = 0; i < passcnt; i+=pl) {
 				int idx = i;
-				int reverseIdx=refcnt - idx - pl;
+				int reverseIdx=refcnt - idx - pl;;
 				if (passLength <0) {
 					idx = i/2;
 					reverseIdx = refcnt - idx-pl;
 				}
+				idx += pass * blockSize;
+				reverseIdx += pass * blockSize;
 				for (ShuffleRule sr : shuffleRules) {
-					if (sr.isNewPageBefore()) ddPage++;
+					if (sr.isNewPageBefore()) document.newPage();
+					float s = (float)sr.getScale();
+					float offsetx = (float)sr.getOffsetX();
+					float offsety = (float)sr.getOffsetY();
+					if (sr.isOffsetXPercent()) { offsetx = offsetx * size.getWidth()/100;}
+					if (sr.isOffsetXPercent()) { offsety = offsety * size.getHeight()/100;}
+					float a, b, c, d, e, f;
+					switch(sr.getRotate()) {
+					case 'N': 
+						a=s; b=0; c=0; d=s; e=offsetx*s; f=offsety*s; break;
+					case 'R':
+						a=0; b=-s; c=s; d=0; e=offsety*s; f=-offsetx*s; break;
+					case 'U':
+						a=-s; b=0; c=0; d=-s; e=-offsetx*s; f=-offsety*s; break;
+					case 'L':
+						a=0; b=s; c=-s; d=0; e=-offsety*s; f=offsetx*s; break;	
+					default: 
+						throw new RuntimeException(""+sr.getRotate());
+					}
 					int pg = sr.getPageNumber();
 					if (sr.getPageBase() == PageBase.BEGINNING) {
 						pg += idx;
@@ -708,89 +761,48 @@ public class PdfTweak {
 					if (pg < 1)
 						throw new IOException("Invalid page number. Check your n-up rules.");
 					if (pg <= cnt) {
-						destinationPageNumbers[pg] = ddPage;
-						destinationShuffleRules[pg] = sr;
-					}
-				}
-			}
-		}
-		for (int i = 0; i < cnt; i+=pl) {
-			int idx = i;
-			int reverseIdx=refcnt - idx - pl;;
-			if (passLength <0) {
-				idx = i/2;
-				reverseIdx = refcnt - idx-pl;
-			}
-			for (ShuffleRule sr : shuffleRules) {
-				if (sr.isNewPageBefore()) document.newPage();
-				float s = (float)sr.getScale();
-				float offsetx = (float)sr.getOffsetX();
-				float offsety = (float)sr.getOffsetY();
-				if (sr.isOffsetXPercent()) { offsetx = offsetx * size.getWidth()/100;}
-				if (sr.isOffsetXPercent()) { offsety = offsety * size.getHeight()/100;}
-				float a, b, c, d, e, f;
-				switch(sr.getRotate()) {
-				case 'N': 
-					a=s; b=0; c=0; d=s; e=offsetx*s; f=offsety*s; break;
-				case 'R':
-					a=0; b=-s; c=s; d=0; e=offsety*s; f=-offsetx*s; break;
-				case 'U':
-					a=-s; b=0; c=0; d=-s; e=-offsetx*s; f=-offsety*s; break;
-				case 'L':
-					a=0; b=s; c=-s; d=0; e=-offsety*s; f=offsetx*s; break;	
-				default: 
-					throw new RuntimeException(""+sr.getRotate());
-				}
-				int pg = sr.getPageNumber();
-				if (sr.getPageBase() == PageBase.BEGINNING) {
-					pg += idx;
-				} else if (sr.getPageBase() == PageBase.END) {
-					pg += reverseIdx;
-				}
-				if (pg < 1)
-					throw new IOException("Invalid page number. Check your n-up rules.");
-				if (pg <= cnt) {
-					page = writer.getImportedPage(currentReader, pg);
-					cb.addTemplate(page, a, b, c, d, e, f);
-					if (preserveHyperlinks) {
-						List links = currentReader.getLinks(pg);
-						for (int j = 0; j < links.size(); j++) {
-							PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
-							if (link.isInternal()) {
-								int dPage = link.getDestinationPage();
-								ShuffleRule dsr = destinationShuffleRules[dPage];								
-								float dS = (float)dsr.getScale();
-								float dOffsetx = (float)dsr.getOffsetX();
-								float dOffsety = (float)dsr.getOffsetY();
-								if (dsr.isOffsetXPercent()) { dOffsetx = dOffsetx * size.getWidth()/100;}
-								if (dsr.isOffsetXPercent()) { dOffsety = dOffsety * size.getHeight()/100;}
-								float aa, bb, cc, dd, ee, ff;
-								switch(dsr.getRotate()) {
-								case 'N': 
-									aa=dS; bb=0; cc=0; dd=dS; ee=dOffsetx*dS; ff=dOffsety*dS; break;
-								case 'R':
-									aa=0; bb=-dS; cc=dS; dd=0; ee=dOffsety*dS; ff=-dOffsetx*dS; break;
-								case 'U':
-									aa=-dS; bb=0; cc=0; dd=-dS; ee=-dOffsetx*dS; ff=-dOffsety*dS; break;
-								case 'L':
-									aa=0; bb=dS; cc=-dS; dd=0; ee=-dOffsety*dS; ff=dOffsetx*dS; break;	
-								default: 
-									throw new RuntimeException(""+sr.getRotate());
+						page = writer.getImportedPage(currentReader, pg);
+						cb.addTemplate(page, a, b, c, d, e, f);
+						if (preserveHyperlinks) {
+							List links = currentReader.getLinks(pg);
+							for (int j = 0; j < links.size(); j++) {
+								PdfAnnotation.PdfImportedLink link = (PdfAnnotation.PdfImportedLink) links.get(j);
+								if (link.isInternal()) {
+									int dPage = link.getDestinationPage();
+									ShuffleRule dsr = destinationShuffleRules[dPage];								
+									float dS = (float)dsr.getScale();
+									float dOffsetx = (float)dsr.getOffsetX();
+									float dOffsety = (float)dsr.getOffsetY();
+									if (dsr.isOffsetXPercent()) { dOffsetx = dOffsetx * size.getWidth()/100;}
+									if (dsr.isOffsetXPercent()) { dOffsety = dOffsety * size.getHeight()/100;}
+									float aa, bb, cc, dd, ee, ff;
+									switch(dsr.getRotate()) {
+									case 'N': 
+										aa=dS; bb=0; cc=0; dd=dS; ee=dOffsetx*dS; ff=dOffsety*dS; break;
+									case 'R':
+										aa=0; bb=-dS; cc=dS; dd=0; ee=dOffsety*dS; ff=-dOffsetx*dS; break;
+									case 'U':
+										aa=-dS; bb=0; cc=0; dd=-dS; ee=-dOffsetx*dS; ff=-dOffsety*dS; break;
+									case 'L':
+										aa=0; bb=dS; cc=-dS; dd=0; ee=-dOffsety*dS; ff=dOffsetx*dS; break;	
+									default: 
+										throw new RuntimeException(""+sr.getRotate());
+									}
+									link.setDestinationPage(destinationPageNumbers[dPage]);
+									link.transformDestination(aa, bb, cc, dd, ee, ff);
 								}
-								link.setDestinationPage(destinationPageNumbers[dPage]);
-								link.transformDestination(aa, bb, cc, dd, ee, ff);
+								link.transformRect(a, b, c, d, e, f);
+								writer.addAnnotation(link.createAnnotation(writer));
 							}
-							link.transformRect(a, b, c, d, e, f);
-							writer.addAnnotation(link.createAnnotation(writer));
 						}
+						if (sr.getFrameWidth() > 0) {
+							cb.setLineWidth((float)sr.getFrameWidth());
+							cb.rectangle(e, f, a*size.getWidth()+c*size.getHeight(), b*size.getWidth()+d*size.getHeight());
+							cb.stroke();
+						}
+					} else {
+						writer.setPageEmpty(false);
 					}
-					if (sr.getFrameWidth() > 0) {
-						cb.setLineWidth((float)sr.getFrameWidth());
-						cb.rectangle(e, f, a*size.getWidth()+c*size.getHeight(), b*size.getWidth()+d*size.getHeight());
-						cb.stroke();
-					}
-				} else {
-					writer.setPageEmpty(false);
 				}
 			}
 		}

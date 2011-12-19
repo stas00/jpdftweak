@@ -28,9 +28,9 @@ public class ShuffleOption implements CommandOption {
 		throws IOException, DocumentException {
 		
 		if (shuffleRule != null) {
-			int[] passLength = new int[1];
+			int[] passLength = new int[2];
 			ShuffleRule[] rules = ShuffleRule.parseRuleSet(shuffleRule, passLength);
-			tweak.shufflePages(passLength[0], rules);
+			tweak.shufflePages(passLength[0], passLength[1], rules);
 		}
 	}
 

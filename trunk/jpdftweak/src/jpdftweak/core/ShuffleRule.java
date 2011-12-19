@@ -151,7 +151,10 @@ public class ShuffleRule {
 		
 		int pos = ruleSet.indexOf(":");
 		if (pos == -1) throw new NumberFormatException("No colon found");
-		int pages = Integer.parseInt(ruleSet.substring(0, pos));
+		int pos2 = ruleSet.indexOf(',');
+		if (pos2 == -1 || pos2 > pos) pos2 = pos;
+		int pages = Integer.parseInt(ruleSet.substring(0, pos2));
+		int size = pos2 == pos ? 0 : Integer.parseInt(ruleSet.substring(pos2+1, pos));		
 		String[] ruleStrings = ruleSet.substring(pos+1).split(",");
 		ShuffleRule[] rules = new ShuffleRule[ruleStrings.length];
 		for (int i = 0; i < rules.length; i++) {
@@ -160,6 +163,7 @@ public class ShuffleRule {
 		if (rules.length == 0) throw new NumberFormatException("No rules found");
 		if (!rules[0].isNewPageBefore()) throw new NumberFormatException("First rule must have new page before");
 		out_passLength[0] = pages;
+		out_passLength[1] = size;
 		return rules;
 	}
 
