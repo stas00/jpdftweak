@@ -7,6 +7,7 @@
 	<property name="BCMAIL" value="${LIB}/bcmail.jar" />
 	<property name="BCTSP" value="${LIB}/bctsp.jar" />
 	<property name="FORMS" value="${LIB}/forms.jar" />
+	<property name="COMMON" value="${LIB}/jgoodies-common.jar" />
 	<property name="JMUPDF" value="${LIB}/JMuPdf.jar" />
 	<property name="PROGUARD" value="${LIB}/proguard.jar" />
 
@@ -21,6 +22,7 @@
 			<classpath>
 				<pathelement path="${ITEXT}" />
 				<pathelement path="${FORMS}" />
+				<pathelement path="${COMMON}" />
 				<pathelement path="${JMUPDF}" />
 			</classpath>
 		</javac>
@@ -35,7 +37,7 @@
 		<jar destfile="jpdftweak.jar" basedir="build/bin">
 			<manifest>
 				<attribute name="Main-Class" value="jpdftweak.Main"/>
-				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar lib/JmuPdf.jar"/>
+				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar lib/jgoodies-common.jar lib/JmuPdf.jar"/>
 			</manifest>
 		</jar>
 	</target>
@@ -53,6 +55,7 @@
 				<include name="${BCMAIL}"/>
 				<include name="${BCTSP}"/>
 				<include name="${FORMS}"/>
+				<include name="${COMMON}"/>
 				<include name="${JMUPDF}"/>
 			</zipgroupfileset>
 		</zip>
@@ -66,6 +69,7 @@
 				<include name="com/itextpdf/text/pdf/fonts/Helvetica*.afm"/>
 				<exclude name="org/bouncycastle/mail/**"/>
 				<exclude name="org/bouncycastle/util/IPTest.class"/>
+				<exclude name="org/bouncycastle/util/io/pem/AllTests.class"/>
 				<exclude name="org/bouncycastle/util/AllTests.class"/>
 				<exclude name="com/jmupdf/util/**"/>
 				<include name="com/jmupdf/pdf/PdfDocument.class"/>
@@ -74,7 +78,7 @@
 				<include name="com/jmupdf/Document.class"/>
 			</zipfileset>
 		</zip>
-		<java fork="true" jar="${PROGUARD}">
+		<java fork="true" jar="${PROGUARD}" failonerror="true">
 			<!-- Proguard can be very resource hungry -->
 			<jvmarg value="-Xmx128M"/>
 			<jvmarg value="-Xss2M"/>
