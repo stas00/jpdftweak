@@ -37,7 +37,7 @@
 		<jar destfile="jpdftweak.jar" basedir="build/bin">
 			<manifest>
 				<attribute name="Main-Class" value="jpdftweak.Main"/>
-				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar lib/jgoodies-common.jar lib/JmuPdf.jar"/>
+				<attribute name="Class-Path" value="lib/itext.jar lib/bcprov.jar lib/bcmail.jar lib/bctsp.jar lib/forms.jar lib/jgoodies-common.jar lib/JMuPdf.jar"/>
 			</manifest>
 		</jar>
 	</target>
