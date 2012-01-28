@@ -69,7 +69,7 @@ public class PageSizeTab extends Tab {
 		this.add(scaleHeight= new JTextField(), cc.xy(2, 12));
 		this.add(new JLabel("PostScript points"), cc.xy(3, 12));
 		this.add(scaleCenter = new JCheckBox("Center instead of enlarging"), cc.xyw(1,13,3));
-		this.add(scaleNoPreserve = new JCheckBox("Do not preserve aspect ratio"), cc.xyw(1,13,3));
+		this.add(scaleNoPreserve = new JCheckBox("Do not preserve aspect ratio"), cc.xyw(1,14,3));
 		scalePages.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				scaleSize.setEnabled(scalePages.isSelected());
