@@ -38,6 +38,7 @@ public class OutputTab extends Tab {
 	private JComboBox fileType, colorMode, compressionType;
 	private JPanel imagePanel;
 	private final MainForm mainForm;
+	private String currentExtension = ".pdf";
 
 	public OutputTab(MainForm mf){
 		super(new FormLayout("f:p, f:p:g, f:p", "f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p, f:p:g"));
@@ -54,6 +55,9 @@ public class OutputTab extends Tab {
 					return;
 				}
 				String filename = pdfChooser.getSelectedFile().getAbsolutePath();
+				if (!new File(filename).getName().contains(".")) {
+					filename += currentExtension;
+				}
 				filename = setCorrectExtension(filename);
 				if (new File(filename).exists()) {
 					if (JOptionPane.showConfirmDialog (mainForm,
@@ -243,25 +247,24 @@ public class OutputTab extends Tab {
 		}
 	}
 	
-	private String setCorrectExtension(String filename){
-		if(!filename.equals("") && (burst.isSelected() || multipageTiff.isSelected())){
-			if(filename.contains(".")){
-				filename = filename.substring(0, filename.lastIndexOf("."));
-			}
-			if(fileType.getSelectedIndex() == 7 || multipageTiff.isSelected()){
-				return filename += ".tiff";
-			}else{
-				return filename += "."+fileType.getSelectedItem().toString().toLowerCase();
-			}
-		}else if(!filename.equals("") && !burst.isSelected() && !multipageTiff.isSelected()){
-			if(filename.contains(".")){
-				filename = filename.substring(0, filename.lastIndexOf("."));
-			}
-			return filename+".pdf";
+	private String setCorrectExtension(String filename) {
+		boolean changeExtension = filename.endsWith(currentExtension);
+		if (changeExtension) {
+			filename = filename.substring(0, filename.length() - currentExtension.length());
 		}
-		else{
-			return "";
+		if (burst.isSelected() || multipageTiff.isSelected()) {
+			if (fileType.getSelectedIndex() == 7 || multipageTiff.isSelected()) {
+				currentExtension = ".tiff";
+			} else {
+				currentExtension = "." + fileType.getSelectedItem().toString().toLowerCase();
+			}
+		} else {
+			currentExtension = ".pdf";
 		}
+		if (changeExtension) {
+			filename += currentExtension;
+		}
+		return filename;
 	}
 	
 	private void whichToEnable(int option){
