@@ -148,10 +148,10 @@ public class BookmarkTab extends Tab {
 	}
 	
 	protected PdfBookmark getBookmark(Object[] row) {
-		int depth = (Integer)row[0];
+		int depth = row[0] == null ? 1 : (Integer)row[0];
 		boolean open = (Boolean)row[1];
 		String title = (String)row[2];
-		int page = (Integer)row[3];
+		int page = row[3] == null ? 1 : (Integer)row[3];
 		String pagePosition = (String)row[4];
 		boolean bold = (Boolean)row[5];
 		boolean italic = (Boolean)row[6];
