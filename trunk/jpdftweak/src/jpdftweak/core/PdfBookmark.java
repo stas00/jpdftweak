@@ -210,12 +210,23 @@ public class PdfBookmark {
 		int offset = 0;
 		List<PdfBookmark> result = new ArrayList<PdfBookmark>();
 		for (PdfPageRange range: ranges) {
-			result.add(new PdfBookmark(1, range.getInputFile().getFile().getName(), true, offset+1));
+			int[] pages = range.getPages(offset);
+			int initialEmptyPages = 0;
+			while(initialEmptyPages < pages.length && pages[initialEmptyPages] == -1)
+				initialEmptyPages++;
+			result.add(new PdfBookmark(1, range.getInputFile().getFile().getName(), true, offset+1+initialEmptyPages));
 			List<PdfBookmark> bs = range.getInputFile().getBookmarks(2);
 			for (PdfBookmark b : bs) {
-				result.add(b.shiftPageNumber(offset));
+				int realOffset = offset;
+				for (int i = 0; i < pages.length; i++) {
+					if(pages[i] == b.getPage()) {
+						realOffset += (i + 1) - b.getPage();
+						break;
+					}
+				}
+				result.add(b.shiftPageNumber(realOffset));
 			}
-			offset += range.getPages(offset).length;
+			offset += pages.length;
 		}
 		return result;
 	}
