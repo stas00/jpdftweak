@@ -223,7 +223,7 @@ public class OutputTab extends Tab {
 				warning.setToolTipText("<html>This feature is not available<br>" +
 						"in compact version. If you are not<br>" +
 						"using compact version verify that<br>" +
-						"lib/JmuPdf.jar is present and your<br>" +
+						"lib/JMuPdf.jar is present and your<br>" +
 						"download was not corrupted.");
 				multipageTiff.setSelected(false);
 				fileType.setSelectedItem(PdfToImage.ImageType.PDF);
