@@ -12,3 +12,8 @@
 -keep public class jpdftweak.Main {
     public static void main(java.lang.String[]);
 }
+
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
