@@ -9,10 +9,15 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
+import jpdftweak.core.IntegerList;
+import jpdftweak.core.PdfInputFile;
 import jpdftweak.core.PdfTweak;
 import jpdftweak.gui.MainForm;
 import jpdftweak.gui.TableComponent;
+import jpdftweak.gui.TableComponentModel.RowListener;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -45,11 +50,21 @@ public class PageNumberTab extends Tab {
 	}
 
 	public static TableComponent buildPageNumberRanges() {
-		TableComponent result = new TableComponent(new String[] {"Start Page", "Style",  "Prefix", "Logical Page"},
+		final TableComponent result = new TableComponent(new String[] {"Start Page", "Style",  "Prefix", "Logical Page"},
 				new Class[]{ Integer.class, String.class, String.class, Integer.class},
 				new Object[]{1, NUMBER_STYLES[0], "", 1});
 		JComboBox styleValues = new JComboBox(NUMBER_STYLES);
 		result.getTable().getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(styleValues));
+		result.setRowListener(new RowListener() {
+			public void rowChanged(int rowIndex, int columnIndex) {
+				if (columnIndex == 0 || columnIndex == 3) {
+					Object[] row = result.getRow(rowIndex);
+					if(row[columnIndex] == null) {
+						row[columnIndex] = 1;
+					}
+				}
+			}
+		});
 		return result;
 	}
 
@@ -84,6 +99,10 @@ public class PageNumberTab extends Tab {
 			Object[] row = pageNumberRanges.getRow(i);
 			int nstyle = Arrays.asList(NUMBER_STYLES).indexOf(row[1]);
 			if (nstyle == -1) nstyle = 0;
+			if ((Integer) row[3] < 1)
+				throw new IOException("Logical page numbers must be positive");
+			if ((Integer) row[0] < 1)
+				throw new IOException("Start page numbers must be positive");
 			fmts[i] = new PdfPageLabelFormat((Integer)row[0], nstyle, (String)row[2], (Integer)row[3]);
 		}
 		tweak.setPageNumbers(fmts);
