@@ -186,6 +186,8 @@ public class PdfBookmark {
 		toParse = toParse.trim();
 		while(toParse.length()> 0) {
 			int pos = toParse.indexOf("=\"");
+			if (pos == -1)
+				throw new RuntimeException("Invalid option (no equals sign): "+toParse);
 			String key = toParse.substring(0, pos);
 			String value="";
 			toParse = toParse.substring(pos+2);
