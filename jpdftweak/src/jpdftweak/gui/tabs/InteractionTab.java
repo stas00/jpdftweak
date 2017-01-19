@@ -113,6 +113,10 @@ public class InteractionTab extends Tab {
 				int pdur = (Integer)row[4];
 				if (from<0) from +=tweak.getPageCount()+1;
 				if (to<0) to += tweak.getPageCount()+1;
+				if (from > tweak.getPageCount())
+					continue;
+				if (to > tweak.getPageCount())
+					to = tweak.getPageCount();
 				for (int j = from; j <= to; j++) {
 					tweak.setTransition(j, trans, duration, pdur);
 				}
