@@ -182,7 +182,11 @@ public class BookmarkTab extends Tab {
 		if (changeBookmarks.isSelected()) {
 			PdfBookmark[] bm = new PdfBookmark[bookmarks.getRowCount()];
 			for (int i = 0; i < bm.length; i++) {
-				bm[i] = getBookmark(bookmarks.getRow(i));
+				try {
+					bm[i] = getBookmark(bookmarks.getRow(i));
+				} catch (RuntimeException ex) {
+					throw new IOException(ex.getMessage(), ex);
+				}
 			}
 			tweak.updateBookmarks(bm);
 		}
