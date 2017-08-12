@@ -122,8 +122,8 @@ public class MainForm extends JFrame {
 			JOptionPane.showMessageDialog(this, "jPDF Tweak has run out of memory. You may configure Java so that it may use more RAM, or you can enable the Tempfile option on the output tab.", "Out of memory: "+ex.getMessage(), JOptionPane.ERROR_MESSAGE);
 		} finally {
 			if (tweak != null) tweak.cleanup();
+			this.setCursor(null);
 		}
-		this.setCursor(null);
 	}
 
 	public JFileChooser getPdfChooser() {
